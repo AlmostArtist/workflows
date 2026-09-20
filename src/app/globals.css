@@ -36,13 +36,14 @@
   --tint-text: 1;
   --glass: rgba(20, 22, 25, 0.62);
   --scrim: rgba(11, 12, 14, 0.72);
+  --sweep: rgba(255, 255, 255, 0.5);
   --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.45);
   --shadow-lift: 0 1px 2px rgba(0, 0, 0, 0.4);
   --hero-ink: #ffffff;
-  --hero-muted: rgba(255, 255, 255, 0.76);
-  --hero-faint: rgba(255, 255, 255, 0.58);
-  --hero-panel: rgba(7, 9, 12, 0.48);
-  --hero-results: rgba(7, 9, 12, 0.86);
+  --hero-muted: rgba(255, 255, 255, 0.84);
+  --hero-faint: rgba(255, 255, 255, 0.66);
+  --hero-panel: rgba(7, 9, 12, 0.74);
+  --hero-results: rgba(7, 9, 12, 0.94);
   --hero-border: rgba(255, 255, 255, 0.2);
   --hero-code: rgba(255, 255, 255, 0.1);
 
@@ -92,15 +93,18 @@
   --tint-text: 0.41;
   --glass: rgba(255, 255, 255, 0.72);
   --scrim: rgba(247, 246, 244, 0.7);
+  --sweep: rgba(23, 20, 15, 0.055);
   --shadow-float: 0 12px 32px rgba(23, 20, 15, 0.14);
   --shadow-lift: 0 1px 2px rgba(23, 20, 15, 0.06);
-  --hero-ink: #16181b;
-  --hero-muted: #3f444b;
-  --hero-faint: #61666e;
-  --hero-panel: rgba(255, 255, 255, 0.76);
-  --hero-results: rgba(255, 255, 255, 0.96);
-  --hero-border: rgba(22, 24, 27, 0.16);
-  --hero-code: rgba(22, 24, 27, 0.08);
+  /* Hero type stays white in both themes: it sits on the video, not on the page. */
+  --hero-ink: #ffffff;
+  --hero-muted: rgba(255, 255, 255, 0.84);
+  --hero-faint: rgba(255, 255, 255, 0.80);
+  /* The search panel is an input surface, so it stays solid paper in light mode. */
+  --hero-panel: rgba(255, 255, 255, 0.95);
+  --hero-results: rgba(255, 255, 255, 0.99);
+  --hero-border: rgba(255, 255, 255, 0.34);
+  --hero-code: rgba(255, 255, 255, 0.16);
 
   color-scheme: light;
 }
@@ -235,13 +239,41 @@ input[type='radio']:checked::after {
 
 /* The hero is media-led in dark mode and a light editorial wash in light mode. */
 .hero-media {
+  background-color: var(--bg-canvas);
   transition: opacity 260ms ease, filter 260ms ease;
 }
 .hero-scrim {
+  /*
+   * Two jobs, in this order (first layer paints on top):
+   *  1. the closing fade, which resolves to --bg-canvas — white on the light theme,
+   *     graphite on dark — so the footage dissolves into the section beneath it
+   *     instead of ending on a hard band of whatever the last video frame shows;
+   *  2. a vignette underneath it, dark enough that white hero type stays legible
+   *     over any frame.
+   * The fade is held back until 62% so it never reaches the stats row; above that line
+   * the vignette is free to stay dark enough to carry white text.
+   */
   background:
-    radial-gradient(ellipse 90% 70% at 50% 45%, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.56) 100%),
-    linear-gradient(to bottom, transparent 0%, transparent 55%, var(--bg-canvas) 100%);
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 62%,
+      color-mix(in srgb, var(--bg-canvas) 38%, transparent) 76%,
+      color-mix(in srgb, var(--bg-canvas) 86%, transparent) 88%,
+      var(--bg-canvas) 97%
+    ),
+    radial-gradient(ellipse 100% 92% at 50% 40%, rgba(8, 10, 14, 0.40) 0%, rgba(8, 10, 14, 0.66) 100%);
 }
+
+.hero-type {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.32), 0 2px 14px rgba(0, 0, 0, 0.28);
+}
+
+.hero-chip {
+  background: rgba(7, 9, 12, 0.46);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
 .hero-search-panel {
   background: var(--hero-panel);
   border-color: var(--hero-border);
@@ -250,24 +282,6 @@ input[type='radio']:checked::after {
   background: var(--hero-results);
   border-color: var(--hero-border);
 }
-:root[data-theme='light'] .hero-media {
-  /* The video is only an atmospheric texture behind the light paper wash. */
-  opacity: 0.24;
-  filter: saturate(0.48) contrast(0.72) brightness(1.24);
-}
-:root[data-theme='light'] .hero-scrim {
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(247, 246, 244, 0.72) 0%,
-      rgba(247, 246, 244, 0.78) 34%,
-      rgba(247, 246, 244, 0.9) 54%,
-      rgba(247, 246, 244, 0.98) 68%,
-      var(--bg-canvas) 82%,
-      var(--bg-canvas) 100%
-    );
-}
-
 /* A card that lifts on hover without a scale transform — §4.7 still applies. */
 .lift {
   transition:
@@ -451,6 +465,116 @@ article:hover .rank-numeral {
     scroll-behavior: auto !important;
   }
   .lift:hover {
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Luxury action button.
+
+   Restrained by default — a hairline edge and a very shallow vertical gradient —
+   with a single specular sweep crossing it on hover. The sweep is a pseudo-element
+   transform, so it composites on the GPU and never touches layout, and it is
+   suppressed entirely under reduced motion.
+   --------------------------------------------------------------------------- */
+.btn-lux {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 10px;
+  letter-spacing: 0.01em;
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms ease,
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+
+.btn-lux::before {
+  /* Shallow top-light, the thing that stops a flat fill looking printed on. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 62%);
+  pointer-events: none;
+}
+
+.btn-lux::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 1;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.52) 48%,
+    rgba(255, 255, 255, 0.72) 52%,
+    transparent 64%
+  );
+  transform: translateX(-130%);
+  pointer-events: none;
+}
+
+.btn-lux:hover::after,
+.btn-lux:focus-visible::after {
+  transform: translateX(130%);
+  transition: transform 820ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-lux:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-float);
+}
+
+.btn-lux:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-lift);
+}
+
+/* Ember fill — the primary download. */
+.btn-lux-solid {
+  background-color: var(--ember);
+  color: var(--ember-contrast);
+  border: 1px solid color-mix(in srgb, var(--ember) 70%, #000);
+  box-shadow: var(--shadow-lift);
+}
+.btn-lux-solid:hover {
+  background-color: color-mix(in srgb, var(--ember) 92%, #fff);
+}
+
+/* Quiet surface — the same object, used where download is not the lead action. */
+.btn-lux-ghost {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+.btn-lux-ghost:hover {
+  border-color: var(--border-strong);
+  background-color: var(--bg-surface-2);
+}
+.btn-lux-ghost::after {
+  /* --sweep is darker than the surface on paper and lighter on graphite, so the
+     highlight is legible either way; a touch of ember keeps it warm rather than grey. */
+  /* A narrow band, not a wash: wide shoulders read as a smudge rather than a highlight. */
+  background: linear-gradient(
+    102deg,
+    transparent 43%,
+    var(--sweep) 48.5%,
+    color-mix(in srgb, var(--ember) 42%, transparent) 50%,
+    var(--sweep) 51.5%,
+    transparent 57%
+  );
+}
+.btn-lux-ghost::before {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 60%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-lux::after {
+    display: none;
+  }
+  .btn-lux:hover {
     transform: none;
   }
 }

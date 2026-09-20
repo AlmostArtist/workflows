@@ -1,23 +1,10 @@
 'use client';
 
-import { Copy, Download } from './icons';
+import { Copy } from './icons';
 import { toast } from './toast';
 
 /** Primary download action on the detail page. Says exactly what it does (§10). */
-export function DownloadButton({ id, sizeLabel }: { id: string; sizeLabel: string }) {
-  return (
-    <a
-      href={`/api/download/${encodeURIComponent(id)}`}
-      download
-      onClick={() => toast('JSON download started')}
-      className="btn-download"
-    >
-      <Download size={17} />
-      Download .json
-      <span className="font-mono tnum opacity-70">{sizeLabel}</span>
-    </a>
-  );
-}
+export { DownloadJson } from './download-button';
 
 /**
  * Copies the library-relative path of the source file, which is what someone needs when
@@ -44,7 +31,7 @@ export function CopyPathButton({ file, cat }: { file: string; cat: string }) {
           toast('Clipboard unavailable — path is ' + path);
         }
       }}
-      className="inline-flex h-11 items-center gap-2 rounded-card border border-edge-subtle bg-surface-2 px-4 text-small text-primary transition-colors duration-hover hover:border-edge-strong"
+      className="btn-lux btn-lux-ghost inline-flex h-11 items-center gap-2 px-4 text-small font-medium"
     >
       <Copy size={16} />
       Copy import path

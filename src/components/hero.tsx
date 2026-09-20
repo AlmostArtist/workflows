@@ -18,7 +18,7 @@ import { Odometer } from './odometer';
  * under the field, so the first thing the page does is answer a question rather than
  * describe itself.
  *
- * The background prefers a real video (`/hero.mp4`, supplied by the site owner) and
+ * The background prefers a real video (`/Video-wallback.mp4`, supplied by the site owner) and
  * falls back to a generated canvas that animates the product's own subject matter —
  * node graphs assembling and flowing left to right. The fallback is the default, so
  * the page ships complete with no asset to source.
@@ -38,8 +38,8 @@ export function Hero({
     <section className="relative isolate">
       <HeroBackdrop hasVideo={hasVideo} />
 
-      <div className="relative z-10 mx-auto flex min-h-[520px] max-w-shell flex-col items-center justify-center px-4 py-16 text-center sm:min-h-[640px] sm:px-6 sm:py-24 lg:min-h-[720px]">
-        <span className="rise inline-flex items-center gap-2 rounded-chip border border-[var(--hero-border)] bg-[var(--hero-panel)] px-3 py-1.5 text-micro text-[var(--hero-muted)] backdrop-blur-md">
+      <div className="relative z-10 mx-auto flex min-h-[520px] max-w-shell flex-col items-center justify-center px-4 pb-28 pt-16 text-center sm:min-h-[620px] sm:px-6 sm:pb-36 sm:pt-20 lg:min-h-[680px]">
+        <span className="hero-chip rise inline-flex items-center gap-2 rounded-chip border px-3 py-1.5 text-micro text-[var(--hero-muted)] backdrop-blur-md">
           <span className="relative flex h-1.5 w-1.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ember opacity-60" />
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-ember" />
@@ -48,8 +48,8 @@ export function Hero({
         </span>
 
         <h1
-          className="rise mt-6 max-w-hero text-display-l text-[var(--hero-ink)] sm:text-display-xl"
-          style={{ animationDelay: '60ms', textShadow: '0 2px 12px rgba(0,0,0,0.35)' }}
+          className="hero-type rise mt-6 max-w-hero text-display-l text-[var(--hero-ink)] sm:text-display-xl"
+          style={{ animationDelay: '60ms' }}
         >
           Every workflow you need,
           <br />
@@ -57,7 +57,7 @@ export function Hero({
         </h1>
 
         <p
-          className="rise mt-5 max-w-[56ch] text-body text-[var(--hero-muted)]"
+          className="hero-type rise mt-5 max-w-[56ch] text-body text-[var(--hero-muted)]"
           style={{ animationDelay: '120ms' }}
         >
           A searchable foundry of importable{' '}
@@ -72,7 +72,7 @@ export function Hero({
         </div>
 
         <dl
-          className="rise mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-5"
+          className="hero-type rise mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-5"
           style={{ animationDelay: '240ms' }}
         >
           {[
@@ -365,7 +365,7 @@ function LiveSearch({ total }: { total: number }) {
           aria-label="Search workflows"
           aria-expanded={open}
           aria-controls="hero-search-results"
-          className="h-16 min-w-0 w-full bg-transparent text-body text-[var(--hero-ink)] outline-none placeholder:text-[var(--hero-faint)]"
+          className="h-16 min-w-0 w-full bg-transparent text-body text-primary outline-none placeholder:text-tertiary"
         />
         <button
           type="submit"
@@ -389,7 +389,7 @@ function LiveSearch({ total }: { total: number }) {
           )}
 
           {data && data.total === 0 && (
-            <p className="px-5 py-6 text-small text-[var(--hero-muted)]">
+            <p className="px-5 py-6 text-small text-secondary">
               Nothing matches "{term}". Titles and tags come from the catalogue filenames —
               try a broader word.
             </p>
@@ -404,7 +404,7 @@ function LiveSearch({ total }: { total: number }) {
                 >
                   {g.cat}
                 </span>
-                <span className="text-micro text-[var(--hero-faint)]">{categoryName(g.cat)}</span>
+                <span className="text-micro text-meta">{categoryName(g.cat)}</span>
               </div>
               {g.items.map((it) => {
                 idx += 1;
@@ -425,10 +425,10 @@ function LiveSearch({ total }: { total: number }) {
                     >
                       <LottieIcon name={categoryLottie(it.cat)} size={30} mode="static" />
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-small text-[var(--hero-ink)]">
+                    <span className="min-w-0 flex-1 truncate text-small text-primary">
                       {it.title}
                     </span>
-                    <span className="flex-none font-mono text-micro text-[var(--hero-faint)]">
+                    <span className="flex-none font-mono text-micro text-meta">
                       {outputLabel(it.out)}
                     </span>
                   </button>

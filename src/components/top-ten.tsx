@@ -7,7 +7,8 @@ import { categoryColor, categoryName, tintVars } from '@/lib/categories';
 import { kb, num, outputLabel } from '@/lib/format';
 import { categoryLottie } from '@/lib/icon-map';
 import type { GraphEncoding, WorkflowRow } from '@/lib/types';
-import { ChevronLeft, ChevronRight, Download } from './icons';
+import { DownloadJson } from './download-button';
+import { ChevronLeft, ChevronRight } from './icons';
 import { ImportButton } from './import-button';
 import { LottieIcon } from './lottie';
 import { NodeGraph } from './node-graph';
@@ -167,14 +168,7 @@ export function TopTen({
                   </span>
                   <span className="flex flex-none items-center gap-1.5">
                     <ImportButton id={item.id} title={item.title} variant="icon" />
-                    <a
-                      href={`/api/download/${encodeURIComponent(item.id)}`}
-                      download
-                      aria-label={`Download ${item.title}`}
-                      className="btn-download btn-download--icon btn-download--sm"
-                    >
-                      <Download size={14} />
-                    </a>
+                    <DownloadJson id={item.id} variant="icon" filename={item.title} />
                   </span>
                 </div>
               </div>

@@ -94,12 +94,11 @@ export function ImportButton({
 
   const label = phase === 'working' ? 'Copying…' : 'Open in ShopOS';
 
+  // Same luxury treatment as the download control, so the pair reads as one family.
   const styles = {
-    primary:
-      'h-11 px-5 rounded-card bg-ember text-ember-contrast font-semibold shadow-lift hover:brightness-110',
-    secondary:
-      'h-11 px-4 rounded-card border border-edge-subtle bg-surface-2 text-primary hover:border-edge-strong',
-    icon: 'h-8 w-8 rounded-chip border border-edge-subtle bg-surface-2 text-secondary hover:border-ember hover:bg-ember-wash hover:text-ember justify-center',
+    primary: 'btn-lux btn-lux-solid h-11 px-5 font-semibold',
+    secondary: 'btn-lux btn-lux-ghost h-11 px-4',
+    icon: 'btn-lux btn-lux-ghost h-11 w-11 sm:h-8 sm:w-8 justify-center',
   }[variant];
 
   return (
@@ -110,7 +109,7 @@ export function ImportButton({
         disabled={phase === 'working'}
         aria-label={variant === 'icon' ? `Open ${title} in ShopOS` : undefined}
         title={variant === 'icon' ? 'Open in ShopOS' : undefined}
-        className={`inline-flex flex-none items-center gap-2 text-small transition-all duration-hover disabled:opacity-70 ${styles} ${className}`}
+        className={`inline-flex flex-none items-center justify-center gap-2 text-small font-medium disabled:opacity-70 ${styles} ${className}`}
       >
         <ExternalLink size={variant === 'icon' ? 14 : 16} />
         {variant !== 'icon' && label}
@@ -213,7 +212,7 @@ function ImportDialog({
           <button
             type="button"
             onClick={() => open(SPACELAB_URL)}
-            className="inline-flex h-11 items-center gap-2 rounded-card bg-ember px-5 text-small font-semibold text-ember-contrast transition-all duration-hover hover:brightness-110"
+            className="btn-lux btn-lux-solid inline-flex h-11 items-center gap-2 px-5 text-small font-semibold"
           >
             <ExternalLink size={16} />
             Open Spacelab canvas
@@ -221,7 +220,7 @@ function ImportDialog({
           <button
             type="button"
             onClick={() => open(SPACES_URL)}
-            className="inline-flex h-11 items-center gap-2 rounded-card border border-edge-subtle px-4 text-small text-primary transition-colors duration-hover hover:border-edge-strong"
+            className="btn-lux btn-lux-ghost inline-flex h-11 items-center gap-2 px-4 text-small"
           >
             Your spaces
           </button>

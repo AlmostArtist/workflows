@@ -226,6 +226,37 @@ Category tints are one component definition in both themes. `tintVars()` emits
 theme-level alphas, so a collection card is authored once and resolves correctly on either
 ground.
 
+### The hero
+
+`public/Video-wallback.mp4` plays full-bleed behind the landing hero, at full strength in
+**both** themes — the footage is the hero, not a texture to wash out. If the file is removed,
+a generated canvas of drifting node lanes takes over automatically.
+
+Because the type sits on moving footage rather than on the page, **hero text is white in both
+themes** and carries a shadow, and a vignette under the video keeps it legible whatever frame
+arrives. The search field is the exception: it is an input surface, so it stays near-opaque
+paper in light mode and its contents follow the page tokens.
+
+The closing fade resolves to `var(--bg-canvas)` — **white on light, graphite on dark** — so
+the video dissolves into the section beneath it. One rule covers both themes. The fade is held
+back until 62% of the hero's height so it never reaches the stats row, and it starts well
+before the footage's own dark lower third, which was previously reading as a black band across
+the bottom of the hero.
+
+### Buttons
+
+Every download, import and copy action shares one treatment (`.btn-lux` in `globals.css`):
+a hairline edge, a shallow top-light, a 1px lift on hover, and a single narrow specular sweep
+that crosses the face. The sweep is a pseudo-element transform, so it composites on the GPU
+and never touches layout.
+
+A white sweep is invisible on white, so `--sweep` is **darker than its surface on paper and
+lighter on graphite**, with a thread of ember through the core. The whole effect is suppressed
+under `prefers-reduced-motion`.
+
+`DownloadJson` is the single download control, in three sizes — `lead` on the detail page,
+`inline` in list rows, `icon` in card footers.
+
 ### Motion
 
 Lottie animations (33 of them, in `public/icons`) carry every collection glyph, the wordmark
@@ -237,8 +268,6 @@ the viewport, each is cached per session, and the player itself is a dynamic imp
 follows intent — icons rest on a still frame and animate on hover, so a browse grid is not
 thirty looping animations at once.
 
-The landing hero runs a generated canvas of drifting node lanes; drop a `public/hero.mp4` in
-and it switches to that video automatically, no code change.
 
 `prefers-reduced-motion` disables the counter roll, the entrance stagger, the hero canvas and
 all Lottie playback, leaving static frames.
@@ -280,6 +309,37 @@ near-black.
 
 `--text-tertiary` is the one token that stays light in both themes, because it is used only
 for placeholders, disabled controls and `aria-hidden` separators, which WCAG exempts.
+
+### The hero
+
+`public/Video-wallback.mp4` plays full-bleed behind the landing hero, at full strength in
+**both** themes — the footage is the hero, not a texture to wash out. If the file is removed,
+a generated canvas of drifting node lanes takes over automatically.
+
+Because the type sits on moving footage rather than on the page, **hero text is white in both
+themes** and carries a shadow, and a vignette under the video keeps it legible whatever frame
+arrives. The search field is the exception: it is an input surface, so it stays near-opaque
+paper in light mode and its contents follow the page tokens.
+
+The closing fade resolves to `var(--bg-canvas)` — **white on light, graphite on dark** — so
+the video dissolves into the section beneath it. One rule covers both themes. The fade is held
+back until 62% of the hero's height so it never reaches the stats row, and it starts well
+before the footage's own dark lower third, which was previously reading as a black band across
+the bottom of the hero.
+
+### Buttons
+
+Every download, import and copy action shares one treatment (`.btn-lux` in `globals.css`):
+a hairline edge, a shallow top-light, a 1px lift on hover, and a single narrow specular sweep
+that crosses the face. The sweep is a pseudo-element transform, so it composites on the GPU
+and never touches layout.
+
+A white sweep is invisible on white, so `--sweep` is **darker than its surface on paper and
+lighter on graphite**, with a thread of ember through the core. The whole effect is suppressed
+under `prefers-reduced-motion`.
+
+`DownloadJson` is the single download control, in three sizes — `lead` on the detail page,
+`inline` in list rows, `icon` in card footers.
 
 ### Motion
 

@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { CopyPathButton, DownloadButton } from '@/components/detail-actions';
+import { CopyPathButton } from '@/components/detail-actions';
+import { DownloadJson } from '@/components/download-button';
 import { ImportButton } from '@/components/import-button';
 import { ChevronLeft, Warning } from '@/components/icons';
 import { GraphLegend, NodeGraph } from '@/components/node-graph';
@@ -73,7 +74,7 @@ export default async function WorkflowPage({ params }: { params: Promise<{ id: s
       {/* --- actions --- */}
       <div className="mt-6 flex flex-wrap items-center gap-2">
         <ImportButton id={d.id} title={d.title} variant="primary" />
-        <DownloadButton id={d.id} sizeLabel={kb(d.kb)} />
+        <DownloadJson id={d.id} variant="lead" tone="ghost" sizeLabel={kb(d.kb)} filename={d.file} />
         <CopyPathButton file={d.file} cat={d.cat} />
         {downloads > 0 && (
           <span className="ml-1 font-mono text-micro tnum text-meta">

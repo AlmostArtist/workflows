@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 import { categoryColor } from '@/lib/categories';
 import { kb, modelSummary, outputLabel } from '@/lib/format';
 import type { GraphEncoding, WorkflowRow } from '@/lib/types';
-import { Download } from './icons';
+import { DownloadJson } from './download-button';
 import { ImportButton } from './import-button';
 import { CategoryTile, StatusPill } from './primitives';
 import { NodeGraph } from './node-graph';
@@ -14,69 +14,6 @@ import { toast } from './toast';
 
 function downloadHref(id: string) {
   return `/api/download/${encodeURIComponent(id)}`;
-}
-
-/** Stops the row's own navigation when the download pill inside it is pressed (§6.1). */
-function useStopNav() {
-  return useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-  }, []);
-}
-
-function DownloadPill({ id, compact = false }: { id: string; compact?: boolean }) {
-  const stop = useStopNav();
-
-  if (compact) {
-    return (
-      <a
-        href={downloadHref(id)}
-        download
-        onClick={(e) => {
-          stop(e);
-          toast('JSON download started');
-        }}
-        aria-label="Download .json"
-        title="Download JSON"
-        className="btn-download btn-download--icon btn-download--sm"
-      >
-        <Download size={15} />
-      </a>
-    );
-  }
-
-  return (
-    <>
-      {/* Mobile: icon-only */}
-      <a
-        href={downloadHref(id)}
-        download
-        onClick={(e) => {
-          stop(e);
-          toast('JSON download started');
-        }}
-        aria-label="Download .json"
-        title="Download JSON"
-        className="btn-download btn-download--icon btn-download--sm sm:hidden"
-      >
-        <Download size={15} />
-      </a>
-      {/* Desktop: icon + label */}
-      <a
-        href={downloadHref(id)}
-        download
-        onClick={(e) => {
-          stop(e);
-          toast('JSON download started');
-        }}
-        aria-label="Download .json"
-        title="Download JSON"
-        className="btn-download btn-download--sm hidden sm:inline-flex"
-      >
-        <Download size={15} />
-        <span className="font-mono text-micro">.json</span>
-      </a>
-    </>
-  );
 }
 
 /**
@@ -133,7 +70,7 @@ export function WorkflowListRow({ row, style }: { row: WorkflowRow; style?: Reac
         </Link>
         <span className="flex flex-none items-center gap-1.5">
           <ImportButton id={row.id} title={row.title} variant="icon" />
-          <DownloadPill id={row.id} />
+          <DownloadJson id={row.id} variant="inline" filename={row.title} />
         </span>
       </div>
     </div>
@@ -215,7 +152,7 @@ export function WorkflowGridTile({
           <span className="font-mono text-micro tnum text-meta">{kb(row.kb)}</span>
           <span className="flex items-center gap-1.5">
             <ImportButton id={row.id} title={row.title} variant="icon" />
-            <DownloadPill id={row.id} compact />
+            <DownloadJson id={row.id} variant="icon" filename={row.title} />
           </span>
         </div>
       </div>

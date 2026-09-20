@@ -1,0 +1,448 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   Token system.
+
+   Light is the default surface — warm paper, the theme the site opens on. Dark is a
+   full second theme rather than an inversion: the same ember accent and the same
+   fourteen category hues on graphite, swapping "elevation by tint" for "elevation by
+   border" so cards still separate without shadows doing the work.
+   --------------------------------------------------------------------------- */
+:root[data-theme='dark'] {
+  --bg-canvas: #0b0c0e;
+  --bg-surface: #141619;
+  --bg-surface-2: #1c1f23;
+  --bg-inset: #08090a;
+  --border-subtle: #24272b;
+  --border-strong: #34383e;
+  --text-primary: #edeef0;
+  --text-secondary: #9ca0a6;
+  --text-meta: #82868d;
+  --text-tertiary: #5b5f66;
+  --ember: #ff7a1a;
+  --ember-dim: #b85a17;
+  --ember-wash: rgba(255, 122, 26, 0.08);
+  --ember-contrast: #0b0c0e;
+  --signal-video: #4fa9e8;
+  --signal-image: #e8b84f;
+  --signal-error: #e8544f;
+  --signal-ok: #4fe8a0;
+
+  /* Alpha used when a category colour becomes a card tint or a pill fill. */
+  --tint-fill: 0.1;
+  --tint-border: 0.22;
+  --tint-text: 1;
+  --glass: rgba(20, 22, 25, 0.62);
+  --scrim: rgba(11, 12, 14, 0.72);
+  --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lift: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --hero-ink: #ffffff;
+  --hero-muted: rgba(255, 255, 255, 0.76);
+  --hero-faint: rgba(255, 255, 255, 0.58);
+  --hero-panel: rgba(7, 9, 12, 0.48);
+  --hero-results: rgba(7, 9, 12, 0.86);
+  --hero-border: rgba(255, 255, 255, 0.2);
+  --hero-code: rgba(255, 255, 255, 0.1);
+
+  color-scheme: dark;
+}
+
+/* Typefaces are theme-independent, so they are declared once outside the theme blocks.
+   The stack degrades to the platform UI sans — never to a serif — if the webfont
+   fails to load. */
+:root {
+  --font-display: 'General Sans', 'Söhne', 'Inter', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'Berkeley Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
+    Consolas, 'Liberation Mono', monospace;
+}
+
+:root,
+:root[data-theme='light'] {
+  --bg-canvas: #f7f6f4;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #f2f1ee;
+  --bg-inset: #eceae6;
+  --border-subtle: #e2e0db;
+  --border-strong: #cbc8c1;
+  --text-primary: #16181b;
+  --text-secondary: #565a61;
+  /* Every content token below clears WCAG AA (>=4.6:1) against the lightest surface
+     it can sit on, --bg-inset. --text-tertiary is the one exception and stays light,
+     because it is only ever a placeholder or a disabled control, which AA exempts. */
+  --text-meta: #656870;
+  --text-tertiary: #9a9ea6;
+  --ember: #b24708;
+  --ember-dim: #d4692a;
+  --ember-wash: rgba(178, 71, 8, 0.09);
+  --ember-contrast: #ffffff;
+  --signal-video: #1e6ca8;
+  --signal-image: #836311;
+  --signal-error: #b8322d;
+  --signal-ok: #14764c;
+
+  --tint-fill: 0.12;
+  --tint-border: 0.32;
+  /* Category hues are tuned for a dark ground. On paper the same hue as text is far
+     too pale — at 0.72 the yellow-lime of collection I measured 2.25:1. 0.41 is the
+     most hue that still clears AA on every tinted card (worst case 4.68:1, collection
+     I), so the collections stay colour-coded instead of collapsing to near-black. */
+  --tint-text: 0.41;
+  --glass: rgba(255, 255, 255, 0.72);
+  --scrim: rgba(247, 246, 244, 0.7);
+  --shadow-float: 0 12px 32px rgba(23, 20, 15, 0.14);
+  --shadow-lift: 0 1px 2px rgba(23, 20, 15, 0.06);
+  --hero-ink: #16181b;
+  --hero-muted: #3f444b;
+  --hero-faint: #61666e;
+  --hero-panel: rgba(255, 255, 255, 0.76);
+  --hero-results: rgba(255, 255, 255, 0.96);
+  --hero-border: rgba(22, 24, 27, 0.16);
+  --hero-code: rgba(22, 24, 27, 0.08);
+
+  color-scheme: light;
+}
+
+/* Matches the default so a first paint before the theme script cannot flash graphite. */
+html {
+  color-scheme: light;
+}
+
+* {
+  border-color: var(--border-subtle);
+}
+
+html {
+  background: var(--bg-canvas);
+}
+
+body {
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Theme swap is a deliberate, visible transition rather than an instant flip. */
+html.theme-ready body,
+html.theme-ready body * {
+  transition:
+    background-color 260ms ease,
+    border-color 260ms ease,
+    color 180ms ease;
+}
+
+/* §9 — the focus ring is 2px ember and is never removed. */
+:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- scrollbars ----------------------------------------------------------- */
+* {
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-width: thin;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 6px;
+  border: 2px solid var(--bg-canvas);
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Horizontal rails (Top 10, related) hide the bar but stay scrollable and keyboard-reachable. */
+.rail-scroll {
+  scrollbar-width: none;
+}
+.rail-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- form controls -------------------------------------------------------- */
+input[type='checkbox'],
+input[type='radio'] {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  flex: none;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-inset);
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition:
+    border-color 120ms,
+    background-color 120ms;
+}
+input[type='checkbox'] {
+  border-radius: 4px;
+}
+input[type='radio'] {
+  border-radius: 50%;
+}
+input[type='checkbox']:checked,
+input[type='radio']:checked {
+  background: var(--ember);
+  border-color: var(--ember);
+}
+input[type='checkbox']:checked::after {
+  content: '';
+  width: 9px;
+  height: 9px;
+  background: var(--ember-contrast);
+  clip-path: polygon(14% 47%, 0 60%, 39% 100%, 100% 22%, 86% 10%, 37% 71%);
+}
+input[type='radio']:checked::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ember-contrast);
+}
+
+::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* --- reusable surface treatments ------------------------------------------ */
+
+/* Frosted panel used by the hero search and the sticky nav. */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+/* The hero is media-led in dark mode and a light editorial wash in light mode. */
+.hero-media {
+  transition: opacity 260ms ease, filter 260ms ease;
+}
+.hero-scrim {
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 45%, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.56) 100%),
+    linear-gradient(to bottom, transparent 0%, transparent 55%, var(--bg-canvas) 100%);
+}
+.hero-search-panel {
+  background: var(--hero-panel);
+  border-color: var(--hero-border);
+}
+.hero-search-results {
+  background: var(--hero-results);
+  border-color: var(--hero-border);
+}
+:root[data-theme='light'] .hero-media {
+  opacity: 0.58;
+  filter: saturate(0.72) contrast(0.9) brightness(1.06);
+}
+:root[data-theme='light'] .hero-scrim {
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 45%, rgba(247, 246, 244, 0.42) 0%, rgba(247, 246, 244, 0.72) 100%),
+    linear-gradient(to bottom, rgba(247, 246, 244, 0.24) 0%, rgba(247, 246, 244, 0.82) 78%, var(--bg-canvas) 100%);
+}
+
+/* A card that lifts on hover without a scale transform — §4.7 still applies. */
+.lift {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease;
+}
+.lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-float);
+}
+
+/* Staggered entrance for grids and rails. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes sheen {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Skeleton shimmer for live-search results in flight. */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 0%,
+    var(--bg-surface-2) 40%,
+    var(--bg-surface) 80%
+  );
+  background-size: 200% 100%;
+  animation: sheen 1.4s linear infinite;
+}
+
+/* Streaming-chart rank numeral: huge, hollow, sitting behind the card. The stroke is
+   heavier than a hairline so the digit still reads at a glance against a busy rail. */
+.rank-numeral {
+  font-variant-numeric: tabular-nums;
+  -webkit-text-stroke: 3px var(--border-strong);
+  color: transparent;
+  line-height: 0.74;
+  user-select: none;
+  transition: -webkit-text-stroke-color 200ms ease;
+}
+article:hover .rank-numeral {
+  -webkit-text-stroke-color: var(--ember);
+}
+
+/* --- luxury download button ------------------------------------------------ */
+
+/* Minimal-luxury treatment for every "Download JSON" action.
+   A translucent light band sweeps left-to-right on hover. The button itself
+   has a refined border, subtle letter-spacing, and restrained transitions. */
+.btn-download {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.75rem; /* 44px — touch target */
+  padding: 0 1.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    background-color 200ms ease;
+}
+
+.btn-download::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 38%,
+    rgba(255, 255, 255, 0.18) 44%,
+    rgba(255, 255, 255, 0.24) 50%,
+    rgba(255, 255, 255, 0.18) 56%,
+    transparent 62%,
+    transparent 100%
+  );
+  transform: translateX(-120%);
+  transition: transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.btn-download > * {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-download:hover {
+  border-color: var(--ember);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ember) 18%, transparent),
+              0 2px 8px color-mix(in srgb, var(--ember) 10%, transparent);
+}
+
+.btn-download:hover::before {
+  transform: translateX(120%);
+}
+
+/* Dark theme: the sweep uses a slightly brighter highlight against graphite. */
+:root[data-theme='dark'] .btn-download::before {
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 38%,
+    rgba(255, 255, 255, 0.09) 44%,
+    rgba(255, 255, 255, 0.14) 50%,
+    rgba(255, 255, 255, 0.09) 56%,
+    transparent 62%,
+    transparent 100%
+  );
+}
+
+/* Icon-only variant keeps the sweep but drops padding to square. */
+.btn-download--icon {
+  padding: 0;
+  width: 2.75rem;
+  justify-content: center;
+}
+.btn-download--icon.btn-download--sm {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 6px;
+}
+
+/* Small variant for compact layouts (top-ten rail, mini-cards). */
+.btn-download--sm {
+  height: 2rem;
+  padding: 0 0.625rem;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* §4.7 / §9 — every motion collapses to an instant state change. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .lift:hover {
+    transform: none;
+  }
+}

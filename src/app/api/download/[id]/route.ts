@@ -2,10 +2,21 @@ import fs from 'node:fs/promises';
 
 import { NextResponse } from 'next/server';
 
-import { getDetail, sourcePath } from '@/lib/catalog';
+import { getDetail, sourcePath, sourceRelativePath } from '@/lib/catalog';
 import { recordDownload } from '@/lib/counters';
 
 export const dynamic = 'force-dynamic';
+
+function remoteDownloadUrl(base: string, relativePath: string): URL | null {
+  try {
+    const root = new URL(base.endsWith('/') ? base : `${base}/`);
+    const encodedPath = relativePath.split('/').map(encodeURIComponent).join('/');
+    const url = new URL(encodedPath, root);
+    return url.href.startsWith(root.href) ? url : null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * §7.6 — serves the real `.json` straight from the library folder and increments the
@@ -21,6 +32,32 @@ export async function GET(
 ) {
   const { id: rawId } = await params;
   const id = decodeURIComponent(rawId);
+  const relativePath = sourceRelativePath(id);
+  if (!relativePath) {
+    return NextResponse.json({ error: `Unknown workflow id: ${id}` }, { status: 404 });
+  }
+
+  const detail = getDetail(id);
+  const filename = detail?.file ?? `${id}.json`;
+
+  // Serverless hosts do not have the local 674 MB library mounted. Configure a CDN or
+  // bucket URL that preserves the A/.../N/... directory structure and downloads redirect
+  // straight to it, leaving the app's serverless function small and fast.
+  const remote = process.env.WORKFLOWS_DOWNLOAD_BASE_URL;
+  if (remote) {
+    const url = remoteDownloadUrl(remote, relativePath);
+    if (!url) {
+      return NextResponse.json(
+        { error: 'WORKFLOWS_DOWNLOAD_BASE_URL is not a valid absolute URL.' },
+        { status: 500 },
+      );
+    }
+    recordDownload(id);
+    const response = NextResponse.redirect(url, 307);
+    response.headers.set('X-Workflow-Id', id);
+    response.headers.set('X-Workflow-Filename', filename);
+    return response;
+  }
 
   const file = sourcePath(id);
   if (!file) {
@@ -37,8 +74,6 @@ export async function GET(
     );
   }
 
-  const detail = getDetail(id);
-  const filename = detail?.file ?? `${id}.json`;
   recordDownload(id);
 
   return new NextResponse(new Uint8Array(body), {

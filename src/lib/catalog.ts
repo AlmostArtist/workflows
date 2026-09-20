@@ -213,12 +213,19 @@ export function getDetail(id: string): WorkflowDetail | null {
 
 let pathMap: Record<string, string> | null = null;
 
-/** Absolute path of the source .json for a workflow id, or null if unknown. */
-export function sourcePath(id: string): string | null {
+/** Library-relative JSON path for a workflow id, or null when the id is unknown/unsafe. */
+export function sourceRelativePath(id: string): string | null {
   if (!pathMap) {
     pathMap = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'paths.json'), 'utf8'));
   }
   const rel = pathMap![id];
+  if (!rel || path.isAbsolute(rel) || rel.split(/[\\/]/).some((part) => part === '..')) return null;
+  return rel.replace(/\\/g, '/');
+}
+
+/** Absolute path of the source .json for a workflow id, or null if unknown. */
+export function sourcePath(id: string): string | null {
+  const rel = sourceRelativePath(id);
   if (!rel) return null;
   const root =
     process.env.WORKFLOWS_LIBRARY_ROOT || path.resolve(process.cwd(), '..');

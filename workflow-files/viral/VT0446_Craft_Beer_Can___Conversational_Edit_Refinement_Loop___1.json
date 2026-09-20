@@ -1,0 +1,474 @@
+{
+  "format": "vibe-workflow-export",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-16T20:43:45.000Z",
+  "doc": {
+    "name": "VT0446. Craft Beer Can \u2014 Conversational Edit-Refinement Loop (#1)",
+    "nodes": [
+      {
+        "id": "nd_G8FFSC09BZC0SDY6W4EECNNC90",
+        "kind": "sticky-note",
+        "position": {
+          "x": 0,
+          "y": -680
+        },
+        "config": {
+          "text": "PIPELINE (from the library spec)\nIngestion \u2192 Base Generation produces or accepts the starting video \u2192 Edit-Request Parser converts each natural-language note ('make the lighting warmer', 'swap the background to a kitchen', 'change the camera to a low angle') into a structured Interactions-API turn \u2192 Omni Flash 1.1 applies each edit conversationally, preserving everything not mentioned in that turn \u2192 Turn-by-Turn Diff Critic confirms only the requested change occurred (no unintended drift elsewhere in frame) \u2192 Repair (re-issue the turn with tighter scoping) on any unintended drift \u2192 Final-state Package once the director approves the accumulated edits."
+        }
+      },
+      {
+        "id": "nd_JY5F9J7XS7EQJEA8MJDGAWJTE5",
+        "kind": "sticky-note",
+        "position": {
+          "x": 0,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 1 \u2014 BASE STATE\nEither an uploaded clip of the Craft Beer Can or a generated base. Every turn below edits the accumulated state, not the original."
+        }
+      },
+      {
+        "id": "nd_WRDEPE9PQMX0ZQQ14FWH8C7PH1",
+        "kind": "video-input",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "url": ""
+        },
+        "name": "Base video \u2014 uploaded or previously generated"
+      },
+      {
+        "id": "nd_X3QBWAZ52V1CAX86P2MCVQHZXX",
+        "kind": "reference-image-input",
+        "position": {
+          "x": 0,
+          "y": 340
+        },
+        "config": {
+          "url": ""
+        },
+        "name": "Craft Beer Can \u2014 reference photo"
+      },
+      {
+        "id": "nd_DMY74V8QYHW1BP7GXD8VK1NPT3",
+        "kind": "prompt",
+        "position": {
+          "x": 0,
+          "y": 680
+        },
+        "config": {
+          "text": "make the lighting warmer\nswap the background to a kitchen\nchange the camera to a low angle\nslow the move down and hold the final frame\n\nReplace these with your own notes, in order."
+        },
+        "name": "Edit requests \u2014 one natural-language note per line"
+      },
+      {
+        "id": "nd_SH7NZBRM45VJY45TMW0RP42YJT",
+        "kind": "sticky-note",
+        "position": {
+          "x": 760,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 2 \u2014 EDIT-REQUEST PARSER + SEQUENTIAL TURNS\nEach natural-language note becomes one scoped Interactions-style turn. Everything not mentioned in a turn must survive that turn untouched."
+        }
+      },
+      {
+        "id": "nd_0XJJ9HKEPPM17TCNK28WV1MS58",
+        "kind": "text-gen",
+        "position": {
+          "x": 760,
+          "y": 340
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 3000,
+          "temperature": 0.35,
+          "system_prompt": "ROLE\nYou are the finishing editor writing instruction 1 in a sequential video-edit\nchain. The clip arriving at this node has already been through every earlier step.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: viral library, section H (Conversational Multi-Turn Editing Systems)\nSystem: VT0446 \u2014 Craft Beer Can \u2014 Conversational Edit-Refinement Loop (#1)\nSubject: Craft Beer Can\nTreatment: Conversational Edit-Refinement Loop\nDeclared models for this system: Gemini Omni Flash 1.1 (Interactions API)\nDeclared input: 1 initial generated or uploaded video of the craft beer can + a sequence of natural-language edit requests.\n\nThe full pipeline you are one node inside:\nIngestion \u2192 Base Generation produces or accepts the starting video \u2192 Edit-Request Parser converts each natural-language note ('make the lighting warmer', 'swap the background to a kitchen', 'change the camera to a low angle') into a structured Interactions-API turn \u2192 Omni Flash 1.1 applies each edit conversationally, preserving everything not mentioned in that turn \u2192 Turn-by-Turn Diff Critic confirms only the requested change occurred (no unintended drift elsewhere in frame) \u2192 Repair (re-issue the turn with tighter scoping) on any unintended drift \u2192 Final-state Package once the director approves the accumulated edits.\n\nThe QC stage that will judge your output:\nTurn-by-turn diff critic compares each new state against the prior state outside the requested edit region; any unintended change outside that region triggers a re-issued, more tightly scoped edit turn.\n\nThe package this pipeline finally owes the client:\nFinal edited video, full turn-by-turn edit history/log (useful as a reusable edit recipe), diff report per turn.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"Apply this edit request to the current video state via conversational editing: [edit note]. Change only what is described \u2014 everything else about the current video (product identity, unrelated framing, unrelated timing) must be preserved exactly as it was in the previous turn.\"\"\n\nTHIS STEP'S JOB\napply only the lighting change requested in note 1, preserving framing, subject, background and timing exactly\n\nMETHOD\n1. Write the instruction as one direct imperative paragraph addressed to the\n   video-edit model. Describe the desired end state, not the process.\n2. Name precisely what must be preserved: subject geometry, label copy, identity,\n   framing, timing, audio sync, background.\n3. Name precisely what may change, and by how much.\n4. Keep it narrow. One transformation per step \u2014 chained steps compound, and a broad\n   instruction destroys the earlier ones.\n\nHARD CONSTRAINTS\n- Never instruct the model to add text, logos, brand marks or legal copy.\n- Never change duration, cut points or audio sync.\n- Never alter a person's identity, body proportions or skin tone.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"edit_instruction\": \"the paragraph the video-edit model receives\",\n    \"must_preserve\": [],\n    \"may_change\": [],\n    \"failure_check\": \"how to tell this step broke an earlier one\"\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        },
+        "name": "Parser \u2014 Turn 1 \u2014 lighting"
+      },
+      {
+        "id": "nd_B87G0V0GKT1ZCQQWXKQXWSXGEX",
+        "kind": "video-edit",
+        "position": {
+          "x": 760,
+          "y": 0
+        },
+        "config": {
+          "task": "edit",
+          "model": "gemini-omni-1.1-flash",
+          "resolution": "1080p"
+        },
+        "name": "Turn 1 \u2014 lighting"
+      },
+      {
+        "id": "nd_N4KPSWG1JYGKYHPX2SEAPKNSQA",
+        "kind": "text-gen",
+        "position": {
+          "x": 1520,
+          "y": 340
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 3000,
+          "temperature": 0.35,
+          "system_prompt": "ROLE\nYou are the finishing editor writing instruction 2 in a sequential video-edit\nchain. The clip arriving at this node has already been through every earlier step.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: viral library, section H (Conversational Multi-Turn Editing Systems)\nSystem: VT0446 \u2014 Craft Beer Can \u2014 Conversational Edit-Refinement Loop (#1)\nSubject: Craft Beer Can\nTreatment: Conversational Edit-Refinement Loop\nDeclared models for this system: Gemini Omni Flash 1.1 (Interactions API)\nDeclared input: 1 initial generated or uploaded video of the craft beer can + a sequence of natural-language edit requests.\n\nThe full pipeline you are one node inside:\nIngestion \u2192 Base Generation produces or accepts the starting video \u2192 Edit-Request Parser converts each natural-language note ('make the lighting warmer', 'swap the background to a kitchen', 'change the camera to a low angle') into a structured Interactions-API turn \u2192 Omni Flash 1.1 applies each edit conversationally, preserving everything not mentioned in that turn \u2192 Turn-by-Turn Diff Critic confirms only the requested change occurred (no unintended drift elsewhere in frame) \u2192 Repair (re-issue the turn with tighter scoping) on any unintended drift \u2192 Final-state Package once the director approves the accumulated edits.\n\nThe QC stage that will judge your output:\nTurn-by-turn diff critic compares each new state against the prior state outside the requested edit region; any unintended change outside that region triggers a re-issued, more tightly scoped edit turn.\n\nThe package this pipeline finally owes the client:\nFinal edited video, full turn-by-turn edit history/log (useful as a reusable edit recipe), diff report per turn.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"Apply this edit request to the current video state via conversational editing: [edit note]. Change only what is described \u2014 everything else about the current video (product identity, unrelated framing, unrelated timing) must be preserved exactly as it was in the previous turn.\"\"\n\nTHIS STEP'S JOB\napply only the background or environment change requested in note 2, preserving the subject, its lighting relationship to the new environment, and the camera\n\nMETHOD\n1. Write the instruction as one direct imperative paragraph addressed to the\n   video-edit model. Describe the desired end state, not the process.\n2. Name precisely what must be preserved: subject geometry, label copy, identity,\n   framing, timing, audio sync, background.\n3. Name precisely what may change, and by how much.\n4. Keep it narrow. One transformation per step \u2014 chained steps compound, and a broad\n   instruction destroys the earlier ones.\n\nHARD CONSTRAINTS\n- Never instruct the model to add text, logos, brand marks or legal copy.\n- Never change duration, cut points or audio sync.\n- Never alter a person's identity, body proportions or skin tone.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"edit_instruction\": \"the paragraph the video-edit model receives\",\n    \"must_preserve\": [],\n    \"may_change\": [],\n    \"failure_check\": \"how to tell this step broke an earlier one\"\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        },
+        "name": "Parser \u2014 Turn 2 \u2014 environment"
+      },
+      {
+        "id": "nd_CPPQ1XWQTNYZ7YM01T0DV1TR8V",
+        "kind": "video-edit",
+        "position": {
+          "x": 1520,
+          "y": 0
+        },
+        "config": {
+          "task": "edit",
+          "model": "gemini-omni-1.1-flash",
+          "resolution": "1080p"
+        },
+        "name": "Turn 2 \u2014 environment"
+      },
+      {
+        "id": "nd_82YT7FQ9N8J07NTYT15XMEA6RD",
+        "kind": "text-gen",
+        "position": {
+          "x": 2280,
+          "y": 340
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 3000,
+          "temperature": 0.35,
+          "system_prompt": "ROLE\nYou are the finishing editor writing instruction 3 in a sequential video-edit\nchain. The clip arriving at this node has already been through every earlier step.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: viral library, section H (Conversational Multi-Turn Editing Systems)\nSystem: VT0446 \u2014 Craft Beer Can \u2014 Conversational Edit-Refinement Loop (#1)\nSubject: Craft Beer Can\nTreatment: Conversational Edit-Refinement Loop\nDeclared models for this system: Gemini Omni Flash 1.1 (Interactions API)\nDeclared input: 1 initial generated or uploaded video of the craft beer can + a sequence of natural-language edit requests.\n\nThe full pipeline you are one node inside:\nIngestion \u2192 Base Generation produces or accepts the starting video \u2192 Edit-Request Parser converts each natural-language note ('make the lighting warmer', 'swap the background to a kitchen', 'change the camera to a low angle') into a structured Interactions-API turn \u2192 Omni Flash 1.1 applies each edit conversationally, preserving everything not mentioned in that turn \u2192 Turn-by-Turn Diff Critic confirms only the requested change occurred (no unintended drift elsewhere in frame) \u2192 Repair (re-issue the turn with tighter scoping) on any unintended drift \u2192 Final-state Package once the director approves the accumulated edits.\n\nThe QC stage that will judge your output:\nTurn-by-turn diff critic compares each new state against the prior state outside the requested edit region; any unintended change outside that region triggers a re-issued, more tightly scoped edit turn.\n\nThe package this pipeline finally owes the client:\nFinal edited video, full turn-by-turn edit history/log (useful as a reusable edit recipe), diff report per turn.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"Apply this edit request to the current video state via conversational editing: [edit note]. Change only what is described \u2014 everything else about the current video (product identity, unrelated framing, unrelated timing) must be preserved exactly as it was in the previous turn.\"\"\n\nTHIS STEP'S JOB\napply only the camera change requested in note 3, preserving subject, lighting and environment\n\nMETHOD\n1. Write the instruction as one direct imperative paragraph addressed to the\n   video-edit model. Describe the desired end state, not the process.\n2. Name precisely what must be preserved: subject geometry, label copy, identity,\n   framing, timing, audio sync, background.\n3. Name precisely what may change, and by how much.\n4. Keep it narrow. One transformation per step \u2014 chained steps compound, and a broad\n   instruction destroys the earlier ones.\n\nHARD CONSTRAINTS\n- Never instruct the model to add text, logos, brand marks or legal copy.\n- Never change duration, cut points or audio sync.\n- Never alter a person's identity, body proportions or skin tone.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"edit_instruction\": \"the paragraph the video-edit model receives\",\n    \"must_preserve\": [],\n    \"may_change\": [],\n    \"failure_check\": \"how to tell this step broke an earlier one\"\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        },
+        "name": "Parser \u2014 Turn 3 \u2014 camera"
+      },
+      {
+        "id": "nd_DT121CKVB8GZVT523X75MK9GZG",
+        "kind": "video-edit",
+        "position": {
+          "x": 2280,
+          "y": 0
+        },
+        "config": {
+          "task": "edit",
+          "model": "gemini-omni-1.1-flash",
+          "resolution": "1080p"
+        },
+        "name": "Turn 3 \u2014 camera"
+      },
+      {
+        "id": "nd_ZVANHSKZ96PBQ34Z3SQZQ4N0C6",
+        "kind": "text-gen",
+        "position": {
+          "x": 3040,
+          "y": 340
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 3000,
+          "temperature": 0.35,
+          "system_prompt": "ROLE\nYou are the finishing editor writing instruction 4 in a sequential video-edit\nchain. The clip arriving at this node has already been through every earlier step.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: viral library, section H (Conversational Multi-Turn Editing Systems)\nSystem: VT0446 \u2014 Craft Beer Can \u2014 Conversational Edit-Refinement Loop (#1)\nSubject: Craft Beer Can\nTreatment: Conversational Edit-Refinement Loop\nDeclared models for this system: Gemini Omni Flash 1.1 (Interactions API)\nDeclared input: 1 initial generated or uploaded video of the craft beer can + a sequence of natural-language edit requests.\n\nThe full pipeline you are one node inside:\nIngestion \u2192 Base Generation produces or accepts the starting video \u2192 Edit-Request Parser converts each natural-language note ('make the lighting warmer', 'swap the background to a kitchen', 'change the camera to a low angle') into a structured Interactions-API turn \u2192 Omni Flash 1.1 applies each edit conversationally, preserving everything not mentioned in that turn \u2192 Turn-by-Turn Diff Critic confirms only the requested change occurred (no unintended drift elsewhere in frame) \u2192 Repair (re-issue the turn with tighter scoping) on any unintended drift \u2192 Final-state Package once the director approves the accumulated edits.\n\nThe QC stage that will judge your output:\nTurn-by-turn diff critic compares each new state against the prior state outside the requested edit region; any unintended change outside that region triggers a re-issued, more tightly scoped edit turn.\n\nThe package this pipeline finally owes the client:\nFinal edited video, full turn-by-turn edit history/log (useful as a reusable edit recipe), diff report per turn.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"Apply this edit request to the current video state via conversational editing: [edit note]. Change only what is described \u2014 everything else about the current video (product identity, unrelated framing, unrelated timing) must be preserved exactly as it was in the previous turn.\"\"\n\nTHIS STEP'S JOB\napply only the pacing or final-frame change requested in note 4, preserving everything visual\n\nMETHOD\n1. Write the instruction as one direct imperative paragraph addressed to the\n   video-edit model. Describe the desired end state, not the process.\n2. Name precisely what must be preserved: subject geometry, label copy, identity,\n   framing, timing, audio sync, background.\n3. Name precisely what may change, and by how much.\n4. Keep it narrow. One transformation per step \u2014 chained steps compound, and a broad\n   instruction destroys the earlier ones.\n\nHARD CONSTRAINTS\n- Never instruct the model to add text, logos, brand marks or legal copy.\n- Never change duration, cut points or audio sync.\n- Never alter a person's identity, body proportions or skin tone.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"edit_instruction\": \"the paragraph the video-edit model receives\",\n    \"must_preserve\": [],\n    \"may_change\": [],\n    \"failure_check\": \"how to tell this step broke an earlier one\"\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        },
+        "name": "Parser \u2014 Turn 4 \u2014 timing and hold"
+      },
+      {
+        "id": "nd_X9CBWWHCP3QTSMRBE42227FMWP",
+        "kind": "video-edit",
+        "position": {
+          "x": 3040,
+          "y": 0
+        },
+        "config": {
+          "task": "edit",
+          "model": "gemini-omni-1.1-flash",
+          "resolution": "1080p"
+        },
+        "name": "Turn 4 \u2014 timing and hold"
+      },
+      {
+        "id": "nd_DSZZ9283E7TQNETDMZQAR1DEK7",
+        "kind": "sticky-note",
+        "position": {
+          "x": 3800,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 3 \u2014 TURN-BY-TURN DIFF CRITIC\nConfirms only the requested change occurred in each turn \u2014 unintended drift anywhere else in frame is the failure this stage exists to catch."
+        }
+      },
+      {
+        "id": "nd_D6T449R7GR7AJJKW3SG7HGW9S4",
+        "kind": "text-gen",
+        "position": {
+          "x": 3800,
+          "y": 340
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 6000,
+          "temperature": 0.2,
+          "system_prompt": "ROLE\nYou are the critic and QC gate for this system. The 1 generated assets are wired into your reference slots together with the source reference. The pipeline's own QC\nspecification is quoted below and you implement it literally \u2014 you are not here to\nbe encouraging, you are here to catch what ships badly.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: viral library, section H (Conversational Multi-Turn Editing Systems)\nSystem: VT0446 \u2014 Craft Beer Can \u2014 Conversational Edit-Refinement Loop (#1)\nSubject: Craft Beer Can\nTreatment: Conversational Edit-Refinement Loop\nDeclared models for this system: Gemini Omni Flash 1.1 (Interactions API)\nDeclared input: 1 initial generated or uploaded video of the craft beer can + a sequence of natural-language edit requests.\n\nThe full pipeline you are one node inside:\nIngestion \u2192 Base Generation produces or accepts the starting video \u2192 Edit-Request Parser converts each natural-language note ('make the lighting warmer', 'swap the background to a kitchen', 'change the camera to a low angle') into a structured Interactions-API turn \u2192 Omni Flash 1.1 applies each edit conversationally, preserving everything not mentioned in that turn \u2192 Turn-by-Turn Diff Critic confirms only the requested change occurred (no unintended drift elsewhere in frame) \u2192 Repair (re-issue the turn with tighter scoping) on any unintended drift \u2192 Final-state Package once the director approves the accumulated edits.\n\nThe QC stage that will judge your output:\nTurn-by-turn diff critic compares each new state against the prior state outside the requested edit region; any unintended change outside that region triggers a re-issued, more tightly scoped edit turn.\n\nThe package this pipeline finally owes the client:\nFinal edited video, full turn-by-turn edit history/log (useful as a reusable edit recipe), diff report per turn.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"Apply this edit request to the current video state via conversational editing: [edit note]. Change only what is described \u2014 everything else about the current video (product identity, unrelated framing, unrelated timing) must be preserved exactly as it was in the previous turn.\"\"\n\nSCORING AXES \u2014 score each 0-100, independently, per asset\n- subject_fidelity: identity and geometry hold across every frame\n- motion_plausibility: physics, weight, no morphing or sliding\n- continuity: boundary frames match at every join point\n- camera_fidelity: the executed move matches the specified move\n- grade_consistency: identical grade across all clips\n- artifact_freedom: flicker, warping, duplicated limbs, text hallucination\n- turn_scoping: did each turn change only what its note asked for\n- cumulative_drift: has anything degraded across four turns that no turn requested\n- reversibility: could the director undo one turn without losing the others\n\nMETHOD\n1. Score every asset on every axis. Justify each score with a specific observation:\n   \"key light is camera-left in five assets and camera-right in asset 3\", never\n   \"looks a bit off\".\n2. Diff every asset against the forensics spec on the identity-critical regions:\n   logo, geometry, proportions, colourway, label copy.\n3. Any axis below 90 fails that asset. Record the exact failure vector so the\n   repair node can route the fix: relight / logo-reprint / geometry-lock regen /\n   recompose / re-animate / re-grade.\n4. Flag set-level problems separately from per-asset problems \u2014 a set where every\n   asset passes individually can still fail as a set.\n5. Rank the passing assets for delivery order.\n\nHARD CONSTRAINTS\n- Never pass an asset whose label copy differs from the source.\n- Never pass a comparison, before/after or claim-adjacent asset whose lighting or\n  angle parity would make the comparison misleading.\n- Two failed repair attempts on the same asset escalates to human review. Say so.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"per_asset\": [{\"asset\":1,\"scores\":{},\"observations\":[],\"verdict\":\"pass|fail\",\"failure_vector\":\"\",\"repair_route\":\"\"}],\n    \"set_level_findings\": [{\"attribute\":\"\",\"finding\":\"\",\"assets_affected\":[]}],\n    \"repair_queue\": [{\"asset\":1,\"instruction\":\"\"}],\n    \"escalate_to_human\": [],\n    \"delivery_order\": []\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        },
+        "name": "Turn-by-turn diff critic"
+      },
+      {
+        "id": "nd_QDRZK6MWAT4XXRR3656C837Y4S",
+        "kind": "text-gen",
+        "position": {
+          "x": 3800,
+          "y": 680
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 3000,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the targeted repair director. The critic's report arrives on your prompt\ninput. You rewrite ONLY the failing asset's generation prompt. You never re-brief the\nwhole batch \u2014 isolated repair is the entire point of this stage.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: viral library, section H (Conversational Multi-Turn Editing Systems)\nSystem: VT0446 \u2014 Craft Beer Can \u2014 Conversational Edit-Refinement Loop (#1)\nSubject: Craft Beer Can\nTreatment: Conversational Edit-Refinement Loop\nDeclared models for this system: Gemini Omni Flash 1.1 (Interactions API)\nDeclared input: 1 initial generated or uploaded video of the craft beer can + a sequence of natural-language edit requests.\n\nThe full pipeline you are one node inside:\nIngestion \u2192 Base Generation produces or accepts the starting video \u2192 Edit-Request Parser converts each natural-language note ('make the lighting warmer', 'swap the background to a kitchen', 'change the camera to a low angle') into a structured Interactions-API turn \u2192 Omni Flash 1.1 applies each edit conversationally, preserving everything not mentioned in that turn \u2192 Turn-by-Turn Diff Critic confirms only the requested change occurred (no unintended drift elsewhere in frame) \u2192 Repair (re-issue the turn with tighter scoping) on any unintended drift \u2192 Final-state Package once the director approves the accumulated edits.\n\nThe QC stage that will judge your output:\nTurn-by-turn diff critic compares each new state against the prior state outside the requested edit region; any unintended change outside that region triggers a re-issued, more tightly scoped edit turn.\n\nThe package this pipeline finally owes the client:\nFinal edited video, full turn-by-turn edit history/log (useful as a reusable edit recipe), diff report per turn.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"Apply this edit request to the current video state via conversational editing: [edit note]. Change only what is described \u2014 everything else about the current video (product identity, unrelated framing, unrelated timing) must be preserved exactly as it was in the previous turn.\"\"\n\nMETHOD\n1. Read the repair queue. Take the highest-priority failing asset.\n2. Identify the failure vector exactly: colour drift, logo distortion, geometry warp,\n   lighting mismatch, scale error, artifact, continuity break, motion implausibility.\n3. Rewrite that asset's prompt so the failure is addressed by construction, not by\n   pleading \u2014 if the logo warped, change the angle and lens that made it warp and\n   state the logo's exact position and scale; if the colour drifted, restate the\n   exact colourway and remove the ambient bounce that shifted it.\n4. Change nothing else. Every passing attribute of that asset must survive the repair.\n5. Write the stricter negative prompt for the retry.\n\nHARD CONSTRAINTS\n- One asset per repair pass. Never merge two failures into one rewrite.\n- Never \"improve\" anything the critic did not flag.\n- If this is the second failed attempt on the same asset, say so and recommend\n  human review instead of a third automated retry.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"asset_being_repaired\": 0,\n    \"failure_vector\": \"\",\n    \"root_cause\": \"why the original prompt produced it\",\n    \"repaired_clip_prompt\": \"\",\n    \"negative_prompt\": \"\",\n    \"unchanged_attributes\": [\"everything preserved from the passing version\"],\n    \"attempt_number\": 1\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        },
+        "name": "Re-issue turn \u2014 tighter scoping"
+      },
+      {
+        "id": "nd_TJCXS7S5K037KEM7E5KFYV452P",
+        "kind": "video-edit",
+        "position": {
+          "x": 4560,
+          "y": 0
+        },
+        "config": {
+          "task": "edit",
+          "model": "gemini-omni-1.1-flash",
+          "resolution": "1080p"
+        },
+        "name": "Re-issued turn \u2014 scoped repair",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_YSXG1445EZ7600ZA9PZHJBA930",
+        "kind": "download",
+        "position": {
+          "x": 5320,
+          "y": 340
+        },
+        "config": {
+          "appendable_slots": {
+            "videos": 5
+          }
+        },
+        "name": "Download \u2014 final deliverables"
+      }
+    ],
+    "edges": [
+      {
+        "id": "eg_ARFCBEDMAN14KJV2HARV8GJQVB",
+        "source": "nd_DMY74V8QYHW1BP7GXD8VK1NPT3",
+        "sourceHandle": "text",
+        "target": "nd_0XJJ9HKEPPM17TCNK28WV1MS58",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_76590VSJCEED7SM32XYW7CYG8Q",
+        "source": "nd_X3QBWAZ52V1CAX86P2MCVQHZXX",
+        "sourceHandle": "image",
+        "target": "nd_0XJJ9HKEPPM17TCNK28WV1MS58",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_BP5Y3S4P9887RPHAA02ZS711PN",
+        "source": "nd_0XJJ9HKEPPM17TCNK28WV1MS58",
+        "sourceHandle": "text",
+        "target": "nd_B87G0V0GKT1ZCQQWXKQXWSXGEX",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_TV5G75F9HDYKT935AA0QYZJVAB",
+        "source": "nd_WRDEPE9PQMX0ZQQ14FWH8C7PH1",
+        "sourceHandle": "video",
+        "target": "nd_B87G0V0GKT1ZCQQWXKQXWSXGEX",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_MSGE5G03CH6XQRY6J2GDN8HSMD",
+        "source": "nd_DMY74V8QYHW1BP7GXD8VK1NPT3",
+        "sourceHandle": "text",
+        "target": "nd_N4KPSWG1JYGKYHPX2SEAPKNSQA",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_TKRQBP4MQ2DY3A8DC5HFVA2J0N",
+        "source": "nd_X3QBWAZ52V1CAX86P2MCVQHZXX",
+        "sourceHandle": "image",
+        "target": "nd_N4KPSWG1JYGKYHPX2SEAPKNSQA",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_ZQ1ZVTH04ZCYT2V4M6J2S0MTKY",
+        "source": "nd_N4KPSWG1JYGKYHPX2SEAPKNSQA",
+        "sourceHandle": "text",
+        "target": "nd_CPPQ1XWQTNYZ7YM01T0DV1TR8V",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_GETT2TW3GV0QMS2J8HMNWH8MAV",
+        "source": "nd_B87G0V0GKT1ZCQQWXKQXWSXGEX",
+        "sourceHandle": "video",
+        "target": "nd_CPPQ1XWQTNYZ7YM01T0DV1TR8V",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_WNQTCCK934TJBJNN2V9PCC1VCQ",
+        "source": "nd_DMY74V8QYHW1BP7GXD8VK1NPT3",
+        "sourceHandle": "text",
+        "target": "nd_82YT7FQ9N8J07NTYT15XMEA6RD",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_6R7J5AQTP2044NFZEWVNNWYS44",
+        "source": "nd_X3QBWAZ52V1CAX86P2MCVQHZXX",
+        "sourceHandle": "image",
+        "target": "nd_82YT7FQ9N8J07NTYT15XMEA6RD",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_C28ZNCP5HFAM98NFANDX32T8EJ",
+        "source": "nd_82YT7FQ9N8J07NTYT15XMEA6RD",
+        "sourceHandle": "text",
+        "target": "nd_DT121CKVB8GZVT523X75MK9GZG",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_7QDAW2TN81NJ7EH07NVT3FXNSY",
+        "source": "nd_CPPQ1XWQTNYZ7YM01T0DV1TR8V",
+        "sourceHandle": "video",
+        "target": "nd_DT121CKVB8GZVT523X75MK9GZG",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_FKS6V6B5FWXZTVBW6Q9GHS6XAT",
+        "source": "nd_DMY74V8QYHW1BP7GXD8VK1NPT3",
+        "sourceHandle": "text",
+        "target": "nd_ZVANHSKZ96PBQ34Z3SQZQ4N0C6",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_8XXFV5KY54WKFQERHPJ06G549C",
+        "source": "nd_X3QBWAZ52V1CAX86P2MCVQHZXX",
+        "sourceHandle": "image",
+        "target": "nd_ZVANHSKZ96PBQ34Z3SQZQ4N0C6",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_Q0NMG9M6W4GMVHY99TYSSW3M32",
+        "source": "nd_ZVANHSKZ96PBQ34Z3SQZQ4N0C6",
+        "sourceHandle": "text",
+        "target": "nd_X9CBWWHCP3QTSMRBE42227FMWP",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_NV8KYG4ERYFV5WG4S22Z1HNBBS",
+        "source": "nd_DT121CKVB8GZVT523X75MK9GZG",
+        "sourceHandle": "video",
+        "target": "nd_X9CBWWHCP3QTSMRBE42227FMWP",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_PBAV24C92D0RAZBCXCJ9G72BV6",
+        "source": "nd_DMY74V8QYHW1BP7GXD8VK1NPT3",
+        "sourceHandle": "text",
+        "target": "nd_D6T449R7GR7AJJKW3SG7HGW9S4",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_S8Q7QCNK7JY9G86CQ72B2WQD3W",
+        "source": "nd_X3QBWAZ52V1CAX86P2MCVQHZXX",
+        "sourceHandle": "image",
+        "target": "nd_D6T449R7GR7AJJKW3SG7HGW9S4",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_X3JS8F9GV76RGCE3CAS0YHVD7T",
+        "source": "nd_D6T449R7GR7AJJKW3SG7HGW9S4",
+        "sourceHandle": "text",
+        "target": "nd_QDRZK6MWAT4XXRR3656C837Y4S",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_5GWG1SGCB9TV7MHWS2QRTKQCPK",
+        "source": "nd_X3QBWAZ52V1CAX86P2MCVQHZXX",
+        "sourceHandle": "image",
+        "target": "nd_QDRZK6MWAT4XXRR3656C837Y4S",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_0WNWM8HRKHYCX16SESJHGN24BB",
+        "source": "nd_QDRZK6MWAT4XXRR3656C837Y4S",
+        "sourceHandle": "text",
+        "target": "nd_TJCXS7S5K037KEM7E5KFYV452P",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_K378GS0S8M7GK46BDPTP28KQKA",
+        "source": "nd_X9CBWWHCP3QTSMRBE42227FMWP",
+        "sourceHandle": "video",
+        "target": "nd_TJCXS7S5K037KEM7E5KFYV452P",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_61S718P8CSG4V8BTRGRBHDSJY6",
+        "source": "nd_B87G0V0GKT1ZCQQWXKQXWSXGEX",
+        "sourceHandle": "video",
+        "target": "nd_YSXG1445EZ7600ZA9PZHJBA930",
+        "targetHandle": "videos__0"
+      },
+      {
+        "id": "eg_W29VRNMF1F3CXBK2PAJGN2KXC0",
+        "source": "nd_CPPQ1XWQTNYZ7YM01T0DV1TR8V",
+        "sourceHandle": "video",
+        "target": "nd_YSXG1445EZ7600ZA9PZHJBA930",
+        "targetHandle": "videos__1"
+      },
+      {
+        "id": "eg_CY7PY1YKYWW8CRFENB9K60020P",
+        "source": "nd_DT121CKVB8GZVT523X75MK9GZG",
+        "sourceHandle": "video",
+        "target": "nd_YSXG1445EZ7600ZA9PZHJBA930",
+        "targetHandle": "videos__2"
+      },
+      {
+        "id": "eg_J72PPAVJQG6MX46WS0Z87RH4NR",
+        "source": "nd_X9CBWWHCP3QTSMRBE42227FMWP",
+        "sourceHandle": "video",
+        "target": "nd_YSXG1445EZ7600ZA9PZHJBA930",
+        "targetHandle": "videos__3"
+      },
+      {
+        "id": "eg_S4C787EQREVQ6RXP1XQ6TZ86NH",
+        "source": "nd_TJCXS7S5K037KEM7E5KFYV452P",
+        "sourceHandle": "video",
+        "target": "nd_YSXG1445EZ7600ZA9PZHJBA930",
+        "targetHandle": "videos__4"
+      }
+    ]
+  }
+}

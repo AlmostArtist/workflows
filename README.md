@@ -171,17 +171,14 @@ resolved against `WORKFLOWS_LIBRARY_ROOT` and validated to stay inside it.
 
 #### Netlify and other serverless hosts
 
-The source library is approximately 674 MB and lives outside this app locally. A Netlify
-function cannot read that folder after deployment, so upload the workflow folders to object
-storage or a CDN first, preserving their paths exactly (for example `A/file.json`). Then set
-`WORKFLOWS_DOWNLOAD_BASE_URL` to the public base URL in the Netlify environment-variable UI or
-CLI, with the **Functions** scope, and redeploy. The download endpoint will redirect to the
-stored JSON while local development continues to stream from `WORKFLOWS_LIBRARY_ROOT`.
+The complete workflow library is committed in `workflow-files/` in the public GitHub repository.
+On Netlify, `/api/download/[id]` fetches the matching raw file server-side and returns it as a
+same-origin `.json` attachment. Visitors therefore download only from the website—no local
+server, browser GitHub redirect, or object-storage configuration is required.
 
-Configure your storage origin to return `Content-Type: application/json` and
-`Content-Disposition: attachment` for `.json` files. This keeps downloads consistent after the
-redirect. Do not put this runtime value only in `netlify.toml`; Netlify does not expose those
-variables to functions at runtime.
+`WORKFLOWS_DOWNLOAD_BASE_URL` remains available only if you later want to use a custom CDN or
+storage mirror. Do not put a runtime override only in `netlify.toml`; Netlify does not expose
+those variables to functions at runtime.
 
 Counters live in `data/counters.json` (in-memory, debounced flush). Swap `load`/`persist` in
 `src/lib/counters.ts` for a KV client if you deploy more than one instance.

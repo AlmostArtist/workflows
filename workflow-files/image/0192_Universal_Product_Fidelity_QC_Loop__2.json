@@ -1,0 +1,561 @@
+{
+  "format": "vibe-workflow-export",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-16T20:43:42.000Z",
+  "doc": {
+    "name": "0192. Universal Product-Fidelity QC Loop #2",
+    "nodes": [
+      {
+        "id": "nd_CR3588744S7MMBPFN7XCGP0WTN",
+        "kind": "sticky-note",
+        "position": {
+          "x": 0,
+          "y": -680
+        },
+        "config": {
+          "text": "PIPELINE (from the library spec)\nIngestion of generated batch \u2192 Fidelity Critic scores each image on color-match, logo-integrity, geometry, lighting realism, artifact-freedom (0-100 each) \u2192 Failure Vector Classifier tags the specific defect type \u2192 Targeted Repair routes to the correct fix (relight / logo-reprint / geometry-lock regen) \u2192 Re-score \u2192 escalate to human review if 2 repair attempts fail."
+        }
+      },
+      {
+        "id": "nd_XV91WJBMEDJZ3XM4FYRV32T1DP",
+        "kind": "sticky-note",
+        "position": {
+          "x": 0,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 1 \u2014 BATCH INGESTION\nDrop the generated batch into the multi-image node, plus the source reference the batch is supposed to match."
+        }
+      },
+      {
+        "id": "nd_SF6QBRGCJ3HHG14PQ8NXHNKKAC",
+        "kind": "reference-image-input",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "url": ""
+        },
+        "name": "Source reference \u2014 ground truth"
+      },
+      {
+        "id": "nd_QRV7R2PH7CKZEA0YKT0N7W6CXD",
+        "kind": "image-input-multi",
+        "position": {
+          "x": 0,
+          "y": 340
+        },
+        "config": {
+          "urls": []
+        },
+        "name": "Generated batch under review"
+      },
+      {
+        "id": "nd_2AZW1D9ECE4TDHHA08PEWX1N16",
+        "kind": "image-iterator",
+        "position": {
+          "x": 760,
+          "y": 340
+        },
+        "config": {
+          "images": []
+        },
+        "name": "Batch iterator \u2014 one asset per pass"
+      },
+      {
+        "id": "nd_TSP0SJ02EXQQN4VM4S3WSRBKBX",
+        "kind": "bundle",
+        "position": {
+          "x": 1520,
+          "y": 340
+        },
+        "config": {},
+        "name": "Batch bundle \u2014 whole set as one reference"
+      },
+      {
+        "id": "nd_AV8TNKR5H3N61QMDAD7DN578DZ",
+        "kind": "sticky-note",
+        "position": {
+          "x": 2280,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 2 \u2014 FIDELITY CRITIC\nScores colour-match, logo-integrity, geometry, lighting realism and artifact-freedom 0-100 each."
+        }
+      },
+      {
+        "id": "nd_R3B94NKX0AVJKZJ6RS0KQGN3XP",
+        "kind": "text-gen",
+        "position": {
+          "x": 2280,
+          "y": 0
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 8000,
+          "temperature": 0.2,
+          "system_prompt": "ROLE\nYou are the critic and QC gate for this system. The pipeline's own QC\nspecification is quoted below and you implement it literally \u2014 you are not here to\nbe encouraging, you are here to catch what ships badly.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: image library, section O (QC & Repair Loop Reference Systems)\nSystem: 0192 \u2014 Universal Product-Fidelity QC Loop #2\nSubject: Universal Product-Fidelity QC Loop\nTreatment: Universal Product-Fidelity QC Loop #2\nDeclared models for this system: Nano Banana Pro + Gemini critic\nDeclared input: Any generated product image batch.\n\nThe full pipeline you are one node inside:\nIngestion of generated batch \u2192 Fidelity Critic scores each image on color-match, logo-integrity, geometry, lighting realism, artifact-freedom (0-100 each) \u2192 Failure Vector Classifier tags the specific defect type \u2192 Targeted Repair routes to the correct fix (relight / logo-reprint / geometry-lock regen) \u2192 Re-score \u2192 escalate to human review if 2 repair attempts fail.\n\nThe QC stage that will judge your output:\nThis workflow IS the QC/repair loop \u2014 self-referential; escalates unresolved failures to a human review queue after 2 failed auto-repairs.\n\nThe package this pipeline finally owes the client:\nPass/fail report per image, repaired image set, escalation log.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"You are a strict QA critic for commercial product photography. Score this image against the source product spec on five axes. Any axis below 90 must be classified by exact failure type so a targeted repair \u2014 not a full regeneration \u2014 can be dispatched.\"\"\n\nSCORING AXES \u2014 score each 0-100, independently, per asset\n- colour_match: exact colourway against the forensics spec\n- logo_fidelity: size, position, sharpness, no redraw\n- geometry: proportions and silhouette against spec\n- lighting_realism: shadow direction, softness, colour temperature\n- artifact_freedom: warping, duplication, invented text, HDR halo\n- set_consistency: does this asset belong to the same shoot as its siblings\n\nMETHOD\n1. Score every asset on every axis. Justify each score with a specific observation:\n   \"key light is camera-left in five assets and camera-right in asset 3\", never\n   \"looks a bit off\".\n2. Diff every asset against the forensics spec on the identity-critical regions:\n   logo, geometry, proportions, colourway, label copy.\n3. Any axis below 90 fails that asset. Record the exact failure vector so the\n   repair node can route the fix: relight / logo-reprint / geometry-lock regen /\n   recompose / re-animate / re-grade.\n4. Flag set-level problems separately from per-asset problems \u2014 a set where every\n   asset passes individually can still fail as a set.\n5. Rank the passing assets for delivery order.\n\nHARD CONSTRAINTS\n- Never pass an asset whose label copy differs from the source.\n- Never pass a comparison, before/after or claim-adjacent asset whose lighting or\n  angle parity would make the comparison misleading.\n- Two failed repair attempts on the same asset escalates to human review. Say so.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"per_asset\": [{\"asset\":1,\"scores\":{},\"observations\":[],\"verdict\":\"pass|fail\",\"failure_vector\":\"\",\"repair_route\":\"\"}],\n    \"set_level_findings\": [{\"attribute\":\"\",\"finding\":\"\",\"assets_affected\":[]}],\n    \"repair_queue\": [{\"asset\":1,\"instruction\":\"\"}],\n    \"escalate_to_human\": [],\n    \"delivery_order\": []\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 3
+          }
+        },
+        "name": "Fidelity critic \u2014 per-asset scoring"
+      },
+      {
+        "id": "nd_4RB4570CQMAXT88WRJWT2032QB",
+        "kind": "sticky-note",
+        "position": {
+          "x": 3040,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 3 \u2014 FAILURE VECTOR CLASSIFIER + ROUTED REPAIR\nEach defect type routes to its own fix: relight, logo reprint, geometry-lock regen."
+        }
+      },
+      {
+        "id": "nd_E087SB4Q49D2TF25YJPN77PQQW",
+        "kind": "text-gen",
+        "position": {
+          "x": 3040,
+          "y": 0
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4000,
+          "temperature": 0.3,
+          "system_prompt": "ROLE\nYou are the targeted repair director. The critic's report arrives on your prompt\ninput. You rewrite ONLY the failing asset's generation prompt. You never re-brief the\nwhole batch \u2014 isolated repair is the entire point of this stage.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: image library, section O (QC & Repair Loop Reference Systems)\nSystem: 0192 \u2014 Universal Product-Fidelity QC Loop #2\nSubject: Universal Product-Fidelity QC Loop\nTreatment: Universal Product-Fidelity QC Loop #2\nDeclared models for this system: Nano Banana Pro + Gemini critic\nDeclared input: Any generated product image batch.\n\nThe full pipeline you are one node inside:\nIngestion of generated batch \u2192 Fidelity Critic scores each image on color-match, logo-integrity, geometry, lighting realism, artifact-freedom (0-100 each) \u2192 Failure Vector Classifier tags the specific defect type \u2192 Targeted Repair routes to the correct fix (relight / logo-reprint / geometry-lock regen) \u2192 Re-score \u2192 escalate to human review if 2 repair attempts fail.\n\nThe QC stage that will judge your output:\nThis workflow IS the QC/repair loop \u2014 self-referential; escalates unresolved failures to a human review queue after 2 failed auto-repairs.\n\nThe package this pipeline finally owes the client:\nPass/fail report per image, repaired image set, escalation log.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"You are a strict QA critic for commercial product photography. Score this image against the source product spec on five axes. Any axis below 90 must be classified by exact failure type so a targeted repair \u2014 not a full regeneration \u2014 can be dispatched.\"\"\n\nMETHOD\n1. Read the repair queue. Take the highest-priority failing asset.\n2. Identify the failure vector exactly: colour drift, logo distortion, geometry warp,\n   lighting mismatch, scale error, artifact, continuity break, motion implausibility.\n3. Rewrite that asset's prompt so the failure is addressed by construction, not by\n   pleading \u2014 if the logo warped, change the angle and lens that made it warp and\n   state the logo's exact position and scale; if the colour drifted, restate the\n   exact colourway and remove the ambient bounce that shifted it.\n4. Change nothing else. Every passing attribute of that asset must survive the repair.\n5. Write the stricter negative prompt for the retry.\n\nHARD CONSTRAINTS\n- One asset per repair pass. Never merge two failures into one rewrite.\n- Never \"improve\" anything the critic did not flag.\n- If this is the second failed attempt on the same asset, say so and recommend\n  human review instead of a third automated retry.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"asset_being_repaired\": 0,\n    \"failure_vector\": \"\",\n    \"root_cause\": \"why the original prompt produced it\",\n    \"repaired_image_prompt\": \"\",\n    \"negative_prompt\": \"\",\n    \"unchanged_attributes\": [\"everything preserved from the passing version\"],\n    \"attempt_number\": 1\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 3
+          }
+        },
+        "name": "Classifier route 1 \u2014 Relight route"
+      },
+      {
+        "id": "nd_QKCZPNBY00AE1ZV6DJVHQCRMHH",
+        "kind": "image-gen",
+        "position": {
+          "x": 3800,
+          "y": 0
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score 0-100 on colour match, logo fidelity, geometry and silhouette consistency against the reference. Required frame: Relight route. QC rule for this system: This workflow IS the QC/repair loop \u2014 self-referential; escalates unresolved failures to a human review queue after 2 failed auto-repairs. Reject and retry if the logo is redrawn, any text is invented or garbled, geometry is warped, or the grade drifts.",
+          "aspect_ratio": "1:1",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 3
+          }
+        },
+        "name": "Repair 1 \u2014 Relight route",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_W0Y1HVH0071DEXVYP9N2B3CFBH",
+        "kind": "text-gen",
+        "position": {
+          "x": 3040,
+          "y": 340
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4000,
+          "temperature": 0.3,
+          "system_prompt": "ROLE\nYou are the targeted repair director. The critic's report arrives on your prompt\ninput. You rewrite ONLY the failing asset's generation prompt. You never re-brief the\nwhole batch \u2014 isolated repair is the entire point of this stage.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: image library, section O (QC & Repair Loop Reference Systems)\nSystem: 0192 \u2014 Universal Product-Fidelity QC Loop #2\nSubject: Universal Product-Fidelity QC Loop\nTreatment: Universal Product-Fidelity QC Loop #2\nDeclared models for this system: Nano Banana Pro + Gemini critic\nDeclared input: Any generated product image batch.\n\nThe full pipeline you are one node inside:\nIngestion of generated batch \u2192 Fidelity Critic scores each image on color-match, logo-integrity, geometry, lighting realism, artifact-freedom (0-100 each) \u2192 Failure Vector Classifier tags the specific defect type \u2192 Targeted Repair routes to the correct fix (relight / logo-reprint / geometry-lock regen) \u2192 Re-score \u2192 escalate to human review if 2 repair attempts fail.\n\nThe QC stage that will judge your output:\nThis workflow IS the QC/repair loop \u2014 self-referential; escalates unresolved failures to a human review queue after 2 failed auto-repairs.\n\nThe package this pipeline finally owes the client:\nPass/fail report per image, repaired image set, escalation log.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"You are a strict QA critic for commercial product photography. Score this image against the source product spec on five axes. Any axis below 90 must be classified by exact failure type so a targeted repair \u2014 not a full regeneration \u2014 can be dispatched.\"\"\n\nMETHOD\n1. Read the repair queue. Take the highest-priority failing asset.\n2. Identify the failure vector exactly: colour drift, logo distortion, geometry warp,\n   lighting mismatch, scale error, artifact, continuity break, motion implausibility.\n3. Rewrite that asset's prompt so the failure is addressed by construction, not by\n   pleading \u2014 if the logo warped, change the angle and lens that made it warp and\n   state the logo's exact position and scale; if the colour drifted, restate the\n   exact colourway and remove the ambient bounce that shifted it.\n4. Change nothing else. Every passing attribute of that asset must survive the repair.\n5. Write the stricter negative prompt for the retry.\n\nHARD CONSTRAINTS\n- One asset per repair pass. Never merge two failures into one rewrite.\n- Never \"improve\" anything the critic did not flag.\n- If this is the second failed attempt on the same asset, say so and recommend\n  human review instead of a third automated retry.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"asset_being_repaired\": 0,\n    \"failure_vector\": \"\",\n    \"root_cause\": \"why the original prompt produced it\",\n    \"repaired_image_prompt\": \"\",\n    \"negative_prompt\": \"\",\n    \"unchanged_attributes\": [\"everything preserved from the passing version\"],\n    \"attempt_number\": 1\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 3
+          }
+        },
+        "name": "Classifier route 2 \u2014 Logo reprint route"
+      },
+      {
+        "id": "nd_GC70QD9EX04DZJ7DNE80T9EZGH",
+        "kind": "image-gen",
+        "position": {
+          "x": 3800,
+          "y": 340
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score 0-100 on colour match, logo fidelity, geometry and silhouette consistency against the reference. Required frame: Logo reprint route. QC rule for this system: This workflow IS the QC/repair loop \u2014 self-referential; escalates unresolved failures to a human review queue after 2 failed auto-repairs. Reject and retry if the logo is redrawn, any text is invented or garbled, geometry is warped, or the grade drifts.",
+          "aspect_ratio": "1:1",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 3
+          }
+        },
+        "name": "Repair 2 \u2014 Logo reprint route",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_CSYV56N3HEVCVBZ6Y7NF73CXDA",
+        "kind": "text-gen",
+        "position": {
+          "x": 3040,
+          "y": 680
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4000,
+          "temperature": 0.3,
+          "system_prompt": "ROLE\nYou are the targeted repair director. The critic's report arrives on your prompt\ninput. You rewrite ONLY the failing asset's generation prompt. You never re-brief the\nwhole batch \u2014 isolated repair is the entire point of this stage.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: image library, section O (QC & Repair Loop Reference Systems)\nSystem: 0192 \u2014 Universal Product-Fidelity QC Loop #2\nSubject: Universal Product-Fidelity QC Loop\nTreatment: Universal Product-Fidelity QC Loop #2\nDeclared models for this system: Nano Banana Pro + Gemini critic\nDeclared input: Any generated product image batch.\n\nThe full pipeline you are one node inside:\nIngestion of generated batch \u2192 Fidelity Critic scores each image on color-match, logo-integrity, geometry, lighting realism, artifact-freedom (0-100 each) \u2192 Failure Vector Classifier tags the specific defect type \u2192 Targeted Repair routes to the correct fix (relight / logo-reprint / geometry-lock regen) \u2192 Re-score \u2192 escalate to human review if 2 repair attempts fail.\n\nThe QC stage that will judge your output:\nThis workflow IS the QC/repair loop \u2014 self-referential; escalates unresolved failures to a human review queue after 2 failed auto-repairs.\n\nThe package this pipeline finally owes the client:\nPass/fail report per image, repaired image set, escalation log.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"You are a strict QA critic for commercial product photography. Score this image against the source product spec on five axes. Any axis below 90 must be classified by exact failure type so a targeted repair \u2014 not a full regeneration \u2014 can be dispatched.\"\"\n\nMETHOD\n1. Read the repair queue. Take the highest-priority failing asset.\n2. Identify the failure vector exactly: colour drift, logo distortion, geometry warp,\n   lighting mismatch, scale error, artifact, continuity break, motion implausibility.\n3. Rewrite that asset's prompt so the failure is addressed by construction, not by\n   pleading \u2014 if the logo warped, change the angle and lens that made it warp and\n   state the logo's exact position and scale; if the colour drifted, restate the\n   exact colourway and remove the ambient bounce that shifted it.\n4. Change nothing else. Every passing attribute of that asset must survive the repair.\n5. Write the stricter negative prompt for the retry.\n\nHARD CONSTRAINTS\n- One asset per repair pass. Never merge two failures into one rewrite.\n- Never \"improve\" anything the critic did not flag.\n- If this is the second failed attempt on the same asset, say so and recommend\n  human review instead of a third automated retry.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"asset_being_repaired\": 0,\n    \"failure_vector\": \"\",\n    \"root_cause\": \"why the original prompt produced it\",\n    \"repaired_image_prompt\": \"\",\n    \"negative_prompt\": \"\",\n    \"unchanged_attributes\": [\"everything preserved from the passing version\"],\n    \"attempt_number\": 1\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 3
+          }
+        },
+        "name": "Classifier route 3 \u2014 Geometry-lock route"
+      },
+      {
+        "id": "nd_4N3N34QXPQEWNVNA2DK018CRC9",
+        "kind": "image-gen",
+        "position": {
+          "x": 3800,
+          "y": 680
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score 0-100 on colour match, logo fidelity, geometry and silhouette consistency against the reference. Required frame: Geometry-lock route. QC rule for this system: This workflow IS the QC/repair loop \u2014 self-referential; escalates unresolved failures to a human review queue after 2 failed auto-repairs. Reject and retry if the logo is redrawn, any text is invented or garbled, geometry is warped, or the grade drifts.",
+          "aspect_ratio": "1:1",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 3
+          }
+        },
+        "name": "Repair 3 \u2014 Geometry-lock route",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_VEQHB43C4JZXDY46RM75CYWZB0",
+        "kind": "sticky-note",
+        "position": {
+          "x": 4560,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 4 \u2014 RE-SCORE + ESCALATION\nRepaired assets are re-scored; two failed attempts escalates to human review."
+        }
+      },
+      {
+        "id": "nd_N62QARWHN58TCP3V5V4VEJDNX1",
+        "kind": "text-gen",
+        "position": {
+          "x": 4560,
+          "y": 0
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 6000,
+          "temperature": 0.2,
+          "system_prompt": "ROLE\nYou are the critic and QC gate for this system. The 3 generated assets are wired into your reference slots together with the source reference. The pipeline's own QC\nspecification is quoted below and you implement it literally \u2014 you are not here to\nbe encouraging, you are here to catch what ships badly.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: image library, section O (QC & Repair Loop Reference Systems)\nSystem: 0192 \u2014 Universal Product-Fidelity QC Loop #2\nSubject: Universal Product-Fidelity QC Loop\nTreatment: Universal Product-Fidelity QC Loop #2\nDeclared models for this system: Nano Banana Pro + Gemini critic\nDeclared input: Any generated product image batch.\n\nThe full pipeline you are one node inside:\nIngestion of generated batch \u2192 Fidelity Critic scores each image on color-match, logo-integrity, geometry, lighting realism, artifact-freedom (0-100 each) \u2192 Failure Vector Classifier tags the specific defect type \u2192 Targeted Repair routes to the correct fix (relight / logo-reprint / geometry-lock regen) \u2192 Re-score \u2192 escalate to human review if 2 repair attempts fail.\n\nThe QC stage that will judge your output:\nThis workflow IS the QC/repair loop \u2014 self-referential; escalates unresolved failures to a human review queue after 2 failed auto-repairs.\n\nThe package this pipeline finally owes the client:\nPass/fail report per image, repaired image set, escalation log.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"You are a strict QA critic for commercial product photography. Score this image against the source product spec on five axes. Any axis below 90 must be classified by exact failure type so a targeted repair \u2014 not a full regeneration \u2014 can be dispatched.\"\"\n\nSCORING AXES \u2014 score each 0-100, independently, per asset\n- colour_match: exact colourway against the forensics spec\n- logo_fidelity: size, position, sharpness, no redraw\n- geometry: proportions and silhouette against spec\n- lighting_realism: shadow direction, softness, colour temperature\n- artifact_freedom: warping, duplication, invented text, HDR halo\n- set_consistency: does this asset belong to the same shoot as its siblings\n\nMETHOD\n1. Score every asset on every axis. Justify each score with a specific observation:\n   \"key light is camera-left in five assets and camera-right in asset 3\", never\n   \"looks a bit off\".\n2. Diff every asset against the forensics spec on the identity-critical regions:\n   logo, geometry, proportions, colourway, label copy.\n3. Any axis below 90 fails that asset. Record the exact failure vector so the\n   repair node can route the fix: relight / logo-reprint / geometry-lock regen /\n   recompose / re-animate / re-grade.\n4. Flag set-level problems separately from per-asset problems \u2014 a set where every\n   asset passes individually can still fail as a set.\n5. Rank the passing assets for delivery order.\n\nHARD CONSTRAINTS\n- Never pass an asset whose label copy differs from the source.\n- Never pass a comparison, before/after or claim-adjacent asset whose lighting or\n  angle parity would make the comparison misleading.\n- Two failed repair attempts on the same asset escalates to human review. Say so.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"per_asset\": [{\"asset\":1,\"scores\":{},\"observations\":[],\"verdict\":\"pass|fail\",\"failure_vector\":\"\",\"repair_route\":\"\"}],\n    \"set_level_findings\": [{\"attribute\":\"\",\"finding\":\"\",\"assets_affected\":[]}],\n    \"repair_queue\": [{\"asset\":1,\"instruction\":\"\"}],\n    \"escalate_to_human\": [],\n    \"delivery_order\": []\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 6
+          }
+        },
+        "name": "Re-score \u2014 post-repair verification"
+      },
+      {
+        "id": "nd_0083Y94455MC9WQTFT3FZ9CAA8",
+        "kind": "download",
+        "position": {
+          "x": 5320,
+          "y": 340
+        },
+        "config": {
+          "appendable_slots": {
+            "images": 3
+          }
+        },
+        "name": "Download \u2014 final deliverables"
+      }
+    ],
+    "edges": [
+      {
+        "id": "eg_T5699VWRDMZNR36SG6HZ4T7C5F",
+        "source": "nd_QRV7R2PH7CKZEA0YKT0N7W6CXD",
+        "sourceHandle": "images",
+        "target": "nd_2AZW1D9ECE4TDHHA08PEWX1N16",
+        "targetHandle": "images_port"
+      },
+      {
+        "id": "eg_HP7WE7D130VD356N2C2BZ6BQCH",
+        "source": "nd_2AZW1D9ECE4TDHHA08PEWX1N16",
+        "sourceHandle": "image",
+        "target": "nd_TSP0SJ02EXQQN4VM4S3WSRBKBX",
+        "targetHandle": "image"
+      },
+      {
+        "id": "eg_NY8AAKVD10YYYQ83BP55AD8S8Y",
+        "source": "nd_SF6QBRGCJ3HHG14PQ8NXHNKKAC",
+        "sourceHandle": "image",
+        "target": "nd_R3B94NKX0AVJKZJ6RS0KQGN3XP",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_X1D24QAM185MPPE0JQ61YHFZTQ",
+        "source": "nd_TSP0SJ02EXQQN4VM4S3WSRBKBX",
+        "sourceHandle": "images",
+        "target": "nd_R3B94NKX0AVJKZJ6RS0KQGN3XP",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_92PW8DKHCBV2FJ31K8RAEQC6ZS",
+        "source": "nd_2AZW1D9ECE4TDHHA08PEWX1N16",
+        "sourceHandle": "image",
+        "target": "nd_R3B94NKX0AVJKZJ6RS0KQGN3XP",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_CBEX7GV9DBYXBRWVR6ZVE2CDR1",
+        "source": "nd_R3B94NKX0AVJKZJ6RS0KQGN3XP",
+        "sourceHandle": "text",
+        "target": "nd_E087SB4Q49D2TF25YJPN77PQQW",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_PWQWM06491DTWZECYD5X70ABJ7",
+        "source": "nd_SF6QBRGCJ3HHG14PQ8NXHNKKAC",
+        "sourceHandle": "image",
+        "target": "nd_E087SB4Q49D2TF25YJPN77PQQW",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_80W1P2RAVPSX5FVPCN4219V1RY",
+        "source": "nd_TSP0SJ02EXQQN4VM4S3WSRBKBX",
+        "sourceHandle": "images",
+        "target": "nd_E087SB4Q49D2TF25YJPN77PQQW",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_QRPXE46CPYSFCHWH3ZP1Q5CJ3E",
+        "source": "nd_2AZW1D9ECE4TDHHA08PEWX1N16",
+        "sourceHandle": "image",
+        "target": "nd_E087SB4Q49D2TF25YJPN77PQQW",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_4A9K2JY7WE6HYEQ9BY9A2YFKP3",
+        "source": "nd_E087SB4Q49D2TF25YJPN77PQQW",
+        "sourceHandle": "text",
+        "target": "nd_QKCZPNBY00AE1ZV6DJVHQCRMHH",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_ZNMR03415M853AKSDPK90K21Q7",
+        "source": "nd_SF6QBRGCJ3HHG14PQ8NXHNKKAC",
+        "sourceHandle": "image",
+        "target": "nd_QKCZPNBY00AE1ZV6DJVHQCRMHH",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_CN9CZ9WZYHWTP22EEC9C58V10K",
+        "source": "nd_TSP0SJ02EXQQN4VM4S3WSRBKBX",
+        "sourceHandle": "images",
+        "target": "nd_QKCZPNBY00AE1ZV6DJVHQCRMHH",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_WR86SY4KN2THKPQQEQMR8BYP88",
+        "source": "nd_2AZW1D9ECE4TDHHA08PEWX1N16",
+        "sourceHandle": "image",
+        "target": "nd_QKCZPNBY00AE1ZV6DJVHQCRMHH",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_5RKXF0C7VAQJMMTPRWYX6M3BF3",
+        "source": "nd_R3B94NKX0AVJKZJ6RS0KQGN3XP",
+        "sourceHandle": "text",
+        "target": "nd_W0Y1HVH0071DEXVYP9N2B3CFBH",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_26ZF3V51RNPW7EMXKTHJP2N83E",
+        "source": "nd_SF6QBRGCJ3HHG14PQ8NXHNKKAC",
+        "sourceHandle": "image",
+        "target": "nd_W0Y1HVH0071DEXVYP9N2B3CFBH",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_E74C6ZZ1T4521NZ8HX1XJX1RA9",
+        "source": "nd_TSP0SJ02EXQQN4VM4S3WSRBKBX",
+        "sourceHandle": "images",
+        "target": "nd_W0Y1HVH0071DEXVYP9N2B3CFBH",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_0MNSJPSJN20919H5W1AKC7ECQT",
+        "source": "nd_2AZW1D9ECE4TDHHA08PEWX1N16",
+        "sourceHandle": "image",
+        "target": "nd_W0Y1HVH0071DEXVYP9N2B3CFBH",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_K4F23KM693PS8SQ4MFP4R7HRCX",
+        "source": "nd_W0Y1HVH0071DEXVYP9N2B3CFBH",
+        "sourceHandle": "text",
+        "target": "nd_GC70QD9EX04DZJ7DNE80T9EZGH",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_TZA9KR07K2KD060Z0HZVFGMYTF",
+        "source": "nd_SF6QBRGCJ3HHG14PQ8NXHNKKAC",
+        "sourceHandle": "image",
+        "target": "nd_GC70QD9EX04DZJ7DNE80T9EZGH",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_N0G9VTKAAB8AKC7CZE6PJAV7H1",
+        "source": "nd_TSP0SJ02EXQQN4VM4S3WSRBKBX",
+        "sourceHandle": "images",
+        "target": "nd_GC70QD9EX04DZJ7DNE80T9EZGH",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_STF764PGH5Y5BVNT5VHVAM0G7X",
+        "source": "nd_2AZW1D9ECE4TDHHA08PEWX1N16",
+        "sourceHandle": "image",
+        "target": "nd_GC70QD9EX04DZJ7DNE80T9EZGH",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_1GK9QCSG5JF5JMMW0SWY4RQ4EE",
+        "source": "nd_R3B94NKX0AVJKZJ6RS0KQGN3XP",
+        "sourceHandle": "text",
+        "target": "nd_CSYV56N3HEVCVBZ6Y7NF73CXDA",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_2039J6EMBHG04652DPX2YDB9VQ",
+        "source": "nd_SF6QBRGCJ3HHG14PQ8NXHNKKAC",
+        "sourceHandle": "image",
+        "target": "nd_CSYV56N3HEVCVBZ6Y7NF73CXDA",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_6WAMRV9VEK0ZT1386MT21JVJA1",
+        "source": "nd_TSP0SJ02EXQQN4VM4S3WSRBKBX",
+        "sourceHandle": "images",
+        "target": "nd_CSYV56N3HEVCVBZ6Y7NF73CXDA",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_CZFFBPQ26V28N0PXJJT7NKNJXA",
+        "source": "nd_2AZW1D9ECE4TDHHA08PEWX1N16",
+        "sourceHandle": "image",
+        "target": "nd_CSYV56N3HEVCVBZ6Y7NF73CXDA",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_AA31HTYPM016YE87WV5751ZRP4",
+        "source": "nd_CSYV56N3HEVCVBZ6Y7NF73CXDA",
+        "sourceHandle": "text",
+        "target": "nd_4N3N34QXPQEWNVNA2DK018CRC9",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_FW1FHKD5D5QYCXZF628YMFYGG3",
+        "source": "nd_SF6QBRGCJ3HHG14PQ8NXHNKKAC",
+        "sourceHandle": "image",
+        "target": "nd_4N3N34QXPQEWNVNA2DK018CRC9",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_R2AWBCBR4X8SFPZ57ZF62XR219",
+        "source": "nd_TSP0SJ02EXQQN4VM4S3WSRBKBX",
+        "sourceHandle": "images",
+        "target": "nd_4N3N34QXPQEWNVNA2DK018CRC9",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_GB6NKZ3952PYVFMX3X9WMMTWDP",
+        "source": "nd_2AZW1D9ECE4TDHHA08PEWX1N16",
+        "sourceHandle": "image",
+        "target": "nd_4N3N34QXPQEWNVNA2DK018CRC9",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_3ZQ2GD2FZ9Y4VBQEKQT2MCDNBT",
+        "source": "nd_SF6QBRGCJ3HHG14PQ8NXHNKKAC",
+        "sourceHandle": "image",
+        "target": "nd_N62QARWHN58TCP3V5V4VEJDNX1",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_53EMCRTTCKQ38XTGV870T0SXBA",
+        "source": "nd_TSP0SJ02EXQQN4VM4S3WSRBKBX",
+        "sourceHandle": "images",
+        "target": "nd_N62QARWHN58TCP3V5V4VEJDNX1",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_202763CP98MG5Y4HYWPG79JG0E",
+        "source": "nd_2AZW1D9ECE4TDHHA08PEWX1N16",
+        "sourceHandle": "image",
+        "target": "nd_N62QARWHN58TCP3V5V4VEJDNX1",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_GGBG8WDZDEW18WZNR2D4K0HFSE",
+        "source": "nd_QKCZPNBY00AE1ZV6DJVHQCRMHH",
+        "sourceHandle": "image",
+        "target": "nd_N62QARWHN58TCP3V5V4VEJDNX1",
+        "targetHandle": "reference_images__3"
+      },
+      {
+        "id": "eg_8B5NC5CZD4AGM5CPVJ3EZA6FBY",
+        "source": "nd_GC70QD9EX04DZJ7DNE80T9EZGH",
+        "sourceHandle": "image",
+        "target": "nd_N62QARWHN58TCP3V5V4VEJDNX1",
+        "targetHandle": "reference_images__4"
+      },
+      {
+        "id": "eg_KY4JQN4F594FF5TPT869VRDHEG",
+        "source": "nd_4N3N34QXPQEWNVNA2DK018CRC9",
+        "sourceHandle": "image",
+        "target": "nd_N62QARWHN58TCP3V5V4VEJDNX1",
+        "targetHandle": "reference_images__5"
+      },
+      {
+        "id": "eg_WY0X2PW76AB52ET4S21SBV5B4X",
+        "source": "nd_QKCZPNBY00AE1ZV6DJVHQCRMHH",
+        "sourceHandle": "image",
+        "target": "nd_0083Y94455MC9WQTFT3FZ9CAA8",
+        "targetHandle": "images__0"
+      },
+      {
+        "id": "eg_QY3B59T5A9SHST6W4PW4967YA0",
+        "source": "nd_GC70QD9EX04DZJ7DNE80T9EZGH",
+        "sourceHandle": "image",
+        "target": "nd_0083Y94455MC9WQTFT3FZ9CAA8",
+        "targetHandle": "images__1"
+      },
+      {
+        "id": "eg_W8MABZSBDNM3VVQ636CKTW5HZF",
+        "source": "nd_4N3N34QXPQEWNVNA2DK018CRC9",
+        "sourceHandle": "image",
+        "target": "nd_0083Y94455MC9WQTFT3FZ9CAA8",
+        "targetHandle": "images__2"
+      }
+    ]
+  }
+}

@@ -7,6 +7,9 @@ import { recordDownload } from '@/lib/counters';
 
 export const dynamic = 'force-dynamic';
 
+const GITHUB_LIBRARY_BASE_URL =
+  'https://raw.githubusercontent.com/kishorekrazzy/workflows/main/workflow-files';
+
 function remoteDownloadUrl(base: string, relativePath: string): URL | null {
   try {
     const root = new URL(base.endsWith('/') ? base : `${base}/`);
@@ -23,8 +26,9 @@ function remoteDownloadUrl(base: string, relativePath: string): URL | null {
  * per-workflow counter that powers the "Most downloaded" sort.
  *
  * The files are already individual JSONs on disk, so nothing is zipped or unzipped per
- * request. Behind a CDN, point `WORKFLOWS_LIBRARY_ROOT` at a mounted object store or
- * replace the body below with a signed-URL redirect — the counter call stays the same.
+ * request. In the deployed Netlify site the source files live in this repository's
+ * `workflow-files/` directory. The function fetches the matching raw GitHub file and
+ * returns it as a same-origin attachment, so visitors download only from this website.
  */
 export async function GET(
   _req: Request,
@@ -40,10 +44,11 @@ export async function GET(
   const detail = getDetail(id);
   const filename = detail?.file ?? `${id}.json`;
 
-  // Serverless hosts do not have the local 674 MB library mounted. Configure a CDN or
-  // bucket URL that preserves the A/.../N/... directory structure and downloads redirect
-  // straight to it, leaving the app's serverless function small and fast.
-  const remote = process.env.WORKFLOWS_DOWNLOAD_BASE_URL;
+  // The public GitHub repository is the default production library store. An explicit
+  // URL remains available for mirrors, private CDN origins, or a custom domain.
+  const remote =
+    process.env.WORKFLOWS_DOWNLOAD_BASE_URL ??
+    (process.env.NODE_ENV === 'production' ? GITHUB_LIBRARY_BASE_URL : undefined);
   if (remote) {
     const url = remoteDownloadUrl(remote, relativePath);
     if (!url) {
@@ -52,11 +57,28 @@ export async function GET(
         { status: 500 },
       );
     }
+    let upstream: Response;
+    try {
+      upstream = await fetch(url, { cache: 'force-cache' });
+    } catch {
+      return NextResponse.json({ error: 'Workflow file host is unavailable.' }, { status: 502 });
+    }
+    if (!upstream.ok || !upstream.body) {
+      return NextResponse.json(
+        { error: `Workflow file is unavailable (${upstream.status}).` },
+        { status: upstream.status === 404 ? 404 : 502 },
+      );
+    }
+
     recordDownload(id);
-    const response = NextResponse.redirect(url, 307);
-    response.headers.set('X-Workflow-Id', id);
-    response.headers.set('X-Workflow-Filename', filename);
-    return response;
+    return new NextResponse(upstream.body, {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Content-Disposition': `attachment; filename="${filename.replace(/"/g, '')}"`,
+        'Cache-Control': 'public, max-age=31536000, immutable',
+        'X-Workflow-Id': id,
+      },
+    });
   }
 
   const file = sourcePath(id);

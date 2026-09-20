@@ -1,0 +1,200 @@
+{
+  "format": "vibe-workflow-export",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-20T09:30:30.000Z",
+  "doc": {
+    "name": "F \u2014 choir performance reshoot, foreground occlusion pass, 6 shots",
+    "nodes": [
+      {
+        "id": "nd_NCR2WR56PPZCMR7RQHHG7TRW8A",
+        "kind": "video-input",
+        "position": {
+          "x": 0,
+          "y": 300
+        },
+        "config": {
+          "url": ""
+        },
+        "name": "Source clip *"
+      },
+      {
+        "id": "nd_6MVMSB91REWMPHSJ3V2FW9JS93",
+        "kind": "prompt",
+        "position": {
+          "x": 0,
+          "y": 600
+        },
+        "config": {
+          "text": "RESHOOT BRIEF \u2014 edit before running.\nSource domain: choir performance\nCoverage style: foreground occlusion pass\nLocked: subject, wardrobe, action, location, runtime\nOverridden: camera angle, movement, lens, height, cut rhythm\nPaste the source video URL into the Video input node."
+        },
+        "name": "Reshoot brief"
+      },
+      {
+        "id": "nd_2WD8WX9YZMRT93B5JDN74WFWVY",
+        "kind": "sticky-note",
+        "position": {
+          "x": 0,
+          "y": -60
+        },
+        "config": {
+          "text": "STAGE 1 \u2014 source video is analysed factually, then re-blocked into a timecoded shot list."
+        },
+        "name": "Stage 1"
+      },
+      {
+        "id": "nd_9EBMHKDR8ECNT0Q9TS6ANY4P8R",
+        "kind": "sticky-note",
+        "position": {
+          "x": 2100,
+          "y": -60
+        },
+        "config": {
+          "text": "STAGE 2 \u2014 the shot list becomes one cinematic prompt; video-edit reshoots the original while holding subject and action."
+        },
+        "name": "Stage 2"
+      },
+      {
+        "id": "nd_FPQMRAZ9D07DBH1KHP4GFGYBZ3",
+        "kind": "video-analyzer",
+        "position": {
+          "x": 700,
+          "y": 300
+        },
+        "config": {},
+        "name": "Source analysis"
+      },
+      {
+        "id": "nd_Z5M5G7VWSKB05AETFAKMEW0162",
+        "kind": "concat",
+        "position": {
+          "x": 1050,
+          "y": 450
+        },
+        "config": {
+          "separator": "\n\n---\n\n",
+          "appendable_slots": {
+            "parts": 2
+          }
+        },
+        "name": "Brief + analysis"
+      },
+      {
+        "id": "nd_0Z1E330TZY6HTQD59RHJEBVPH5",
+        "kind": "text-gen",
+        "position": {
+          "x": 1400,
+          "y": 450
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 1600,
+          "temperature": 0.63,
+          "system_prompt": "You act as second-unit DP re-blocking an existing choir performance clip shot-for-shot. The upstream analysis you receive describes the source clip's subject, action beats, wardrobe, environment and total runtime.\n\nTASK. Convert that analysis into a 6-shot camera plan in a foreground occlusion pass idiom. The subject, action and location are FIXED \u2014 you are only re-authoring how the camera sees them.\n\nTIMECODE RULES. Cover the FULL source duration with contiguous timecodes: every shot starts exactly where the previous one ends, the first begins at 00:00 and the last ends on the reported runtime. Never leave a gap, never overlap, never invent runtime the analysis did not report.\n\nSHOT RULES. Minimum 6 distinct shots. No angle, shot size or move may repeat back-to-back; vary lens, height and distance between consecutive shots. Each entry states: timecode range, shot size, lens, camera height, camera move, and the single action beat it must land.\n\nSUGGESTED VOCABULARY. Draw moves from choices like a slow dolly-in that closes about a third of the distance, a locked-off static frame where only the subject moves and a slow push with a simultaneous barely-perceptible dutch roll; sizes from over-the-shoulder and high-angle looking down.\n\nOUTPUT. Return the shot list only, one shot per line, in the form `00:00-00:03 | size | lens | height | move | beat`. No preamble, no summary, no markdown table."
+        },
+        "name": "Camera angle director"
+      },
+      {
+        "id": "nd_0293YYK33Y177KFWNA4KPCWDQB",
+        "kind": "text-gen",
+        "position": {
+          "x": 1750,
+          "y": 450
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 1600,
+          "temperature": 0.56,
+          "system_prompt": "You are the cinematic prompt writer for a choir performance reshoot. You receive a timecoded shot list and must fuse it into ONE production-ready video-generation prompt.\n\nCONTINUITY. The prompt must instruct the model to preserve the ORIGINAL clip's subject identity, wardrobe, props, environment, action and pacing exactly as analysed. Only the camera work is overridden. State this continuity requirement inside the prompt itself, not as a note to the reader.\n\nCAMERA. Translate every shot in the list into flowing prose with explicit timecodes, naming lens, height, move and cut point for each. Preserve the list's order and its foreground occlusion pass idiom.\n\nLOOK. Specify exposure, north-facing window light with a black v-flat for negative fill, and a grade reading as a neutral commercial grade with clean whites and no colour cast. Add a negative clause covering distortion, duplicated objects, melting edges, low quality.\n\nAUDIO. Note whether diegetic audio should be regenerated or held from source, and describe the intended sound bed in one clause.\n\nOUTPUT. Your entire reply is the prompt itself: one dense paragraph, no title, no quotation marks, no trailing notes."
+        },
+        "name": "Cinematic prompt writer"
+      },
+      {
+        "id": "nd_5TG1Y7BB2QQWHS5BKXBV1WAK32",
+        "kind": "video-edit",
+        "position": {
+          "x": 2100,
+          "y": 300
+        },
+        "config": {
+          "task": "edit",
+          "model": "gemini-omni-1.1-flash",
+          "resolution": "720p"
+        },
+        "name": "Reshoot render",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_81NWZ63JQVFV8EFNXB7MTNR0K1",
+        "kind": "download",
+        "position": {
+          "x": 2500,
+          "y": 300
+        },
+        "config": {
+          "appendable_slots": {
+            "videos": 1
+          }
+        },
+        "name": "Reshot cut"
+      }
+    ],
+    "edges": [
+      {
+        "id": "eg_V0CXBB2HV0D273AV1Z6ZMPXEDX",
+        "source": "nd_NCR2WR56PPZCMR7RQHHG7TRW8A",
+        "sourceHandle": "video",
+        "target": "nd_FPQMRAZ9D07DBH1KHP4GFGYBZ3",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_7BS4GRA0EX2DFDPNT6N5FZZR6X",
+        "source": "nd_6MVMSB91REWMPHSJ3V2FW9JS93",
+        "sourceHandle": "text",
+        "target": "nd_Z5M5G7VWSKB05AETFAKMEW0162",
+        "targetHandle": "parts__0"
+      },
+      {
+        "id": "eg_EHESRD6TBPBGJK3K2MBA01RVAD",
+        "source": "nd_FPQMRAZ9D07DBH1KHP4GFGYBZ3",
+        "sourceHandle": "text",
+        "target": "nd_Z5M5G7VWSKB05AETFAKMEW0162",
+        "targetHandle": "parts__1"
+      },
+      {
+        "id": "eg_H8J51GA83BR95YRH3RM3ZS5BND",
+        "source": "nd_Z5M5G7VWSKB05AETFAKMEW0162",
+        "sourceHandle": "text",
+        "target": "nd_0Z1E330TZY6HTQD59RHJEBVPH5",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_ZAVK2K9JFFF8CJ4V57715YG0TV",
+        "source": "nd_0Z1E330TZY6HTQD59RHJEBVPH5",
+        "sourceHandle": "text",
+        "target": "nd_0293YYK33Y177KFWNA4KPCWDQB",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_X9TNAX6K1Y4A0TAM0VYGCMBSE1",
+        "source": "nd_0293YYK33Y177KFWNA4KPCWDQB",
+        "sourceHandle": "text",
+        "target": "nd_5TG1Y7BB2QQWHS5BKXBV1WAK32",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_4DA86Z489YWTZHJ634673SPSWJ",
+        "source": "nd_NCR2WR56PPZCMR7RQHHG7TRW8A",
+        "sourceHandle": "video",
+        "target": "nd_5TG1Y7BB2QQWHS5BKXBV1WAK32",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_MZAS4CTZDBK63AW6JZEDY7TD0Z",
+        "source": "nd_5TG1Y7BB2QQWHS5BKXBV1WAK32",
+        "sourceHandle": "video",
+        "target": "nd_81NWZ63JQVFV8EFNXB7MTNR0K1",
+        "targetHandle": "videos__0"
+      }
+    ]
+  }
+}

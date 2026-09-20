@@ -1,0 +1,200 @@
+{
+  "format": "vibe-workflow-export",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-20T14:15:59.000Z",
+  "doc": {
+    "name": "F \u2014 concert crowd reshoot, mixed speed ramp pass, 5 shots",
+    "nodes": [
+      {
+        "id": "nd_56Z4XQ44DR7YDTG2752BFATE90",
+        "kind": "video-input",
+        "position": {
+          "x": 0,
+          "y": 300
+        },
+        "config": {
+          "url": ""
+        },
+        "name": "Source clip *"
+      },
+      {
+        "id": "nd_9BHZFFR686MJFMBRV6WAAWK2JW",
+        "kind": "prompt",
+        "position": {
+          "x": 0,
+          "y": 600
+        },
+        "config": {
+          "text": "RESHOOT BRIEF \u2014 edit before running.\nSource domain: concert crowd\nCoverage style: mixed speed ramp pass\nLocked: subject, wardrobe, action, location, runtime\nOverridden: camera angle, movement, lens, height, cut rhythm\nPaste the source video URL into the Video input node."
+        },
+        "name": "Reshoot brief"
+      },
+      {
+        "id": "nd_J98PEX5EBTY35FEX8ZRZV9T1YB",
+        "kind": "sticky-note",
+        "position": {
+          "x": 0,
+          "y": -60
+        },
+        "config": {
+          "text": "STAGE 1 \u2014 source video is analysed factually, then re-blocked into a timecoded shot list."
+        },
+        "name": "Stage 1"
+      },
+      {
+        "id": "nd_88QFH9E9ZMTA61R3439DDCCKGA",
+        "kind": "sticky-note",
+        "position": {
+          "x": 2100,
+          "y": -60
+        },
+        "config": {
+          "text": "STAGE 2 \u2014 the shot list becomes one cinematic prompt; video-edit reshoots the original while holding subject and action."
+        },
+        "name": "Stage 2"
+      },
+      {
+        "id": "nd_YP5PEDXWECYH0MTH240A0984XJ",
+        "kind": "video-analyzer",
+        "position": {
+          "x": 700,
+          "y": 300
+        },
+        "config": {},
+        "name": "Source analysis"
+      },
+      {
+        "id": "nd_45ZPC72A34B6K6QT9Z2JQ7CX8S",
+        "kind": "concat",
+        "position": {
+          "x": 1050,
+          "y": 450
+        },
+        "config": {
+          "separator": "\n\n---\n\n",
+          "appendable_slots": {
+            "parts": 2
+          }
+        },
+        "name": "Brief + analysis"
+      },
+      {
+        "id": "nd_KHXMHF3Y1AS6K33XGET43G0EJJ",
+        "kind": "text-gen",
+        "position": {
+          "x": 1400,
+          "y": 450
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 1600,
+          "temperature": 0.69,
+          "system_prompt": "You are the cinematographer rebuilding the camera grammar of a concert crowd clip. The upstream analysis you receive describes the source clip's subject, action beats, wardrobe, environment and total runtime.\n\nTASK. Convert that analysis into a 5-shot camera plan in a mixed speed ramp pass idiom. The subject, action and location are FIXED \u2014 you are only re-authoring how the camera sees them.\n\nTIMECODE RULES. Cover the FULL source duration with contiguous timecodes: every shot starts exactly where the previous one ends, the first begins at 00:00 and the last ends on the reported runtime. Never leave a gap, never overlap, never invent runtime the analysis did not report.\n\nSHOT RULES. Minimum 5 distinct shots. No angle, shot size or move may repeat back-to-back; vary lens, height and distance between consecutive shots. Each entry states: timecode range, shot size, lens, camera height, camera move, and the single action beat it must land.\n\nSUGGESTED VOCABULARY. Draw moves from choices like a vertigo/dolly-zoom counter-move holding the subject size constant, a snap zoom in followed by a settle and a top-down descent onto a flat plane; sizes from high-angle looking down and cowboy three-quarter.\n\nOUTPUT. Return the shot list only, one shot per line, in the form `00:00-00:03 | size | lens | height | move | beat`. No preamble, no summary, no markdown table."
+        },
+        "name": "Camera angle director"
+      },
+      {
+        "id": "nd_6A84TP8FB42CQCXXR7XTGR025W",
+        "kind": "text-gen",
+        "position": {
+          "x": 1750,
+          "y": 450
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 1600,
+          "temperature": 0.7,
+          "system_prompt": "You are the cinematic prompt writer for a concert crowd reshoot. You receive a timecoded shot list and must fuse it into ONE production-ready video-generation prompt.\n\nCONTINUITY. The prompt must instruct the model to preserve the ORIGINAL clip's subject identity, wardrobe, props, environment, action and pacing exactly as analysed. Only the camera work is overridden. State this continuity requirement inside the prompt itself, not as a note to the reader.\n\nCAMERA. Translate every shot in the list into flowing prose with explicit timecodes, naming lens, height, move and cut point for each. Preserve the list's order and its mixed speed ramp pass idiom.\n\nLOOK. Specify exposure, a ring light on axis for flat, modern, shadowless coverage, and a grade reading as a filmic grade with halation on the specular highlights. Add a negative clause covering blur, low quality, blown highlights, muddy shadows.\n\nAUDIO. Note whether diegetic audio should be regenerated or held from source, and describe the intended sound bed in one clause.\n\nOUTPUT. The response must be a lone prompt paragraph \u2014 strip any header, numbering or sign-off."
+        },
+        "name": "Cinematic prompt writer"
+      },
+      {
+        "id": "nd_BVRT9GB0TRVEVZDNET9Y15PHZ2",
+        "kind": "video-edit",
+        "position": {
+          "x": 2100,
+          "y": 300
+        },
+        "config": {
+          "task": "edit",
+          "model": "gemini-omni-1.1-flash",
+          "resolution": "720p"
+        },
+        "name": "Reshoot render",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_4AA8ECDM1M1H1A6KNJ9E3SS209",
+        "kind": "download",
+        "position": {
+          "x": 2500,
+          "y": 300
+        },
+        "config": {
+          "appendable_slots": {
+            "videos": 1
+          }
+        },
+        "name": "Reshot cut"
+      }
+    ],
+    "edges": [
+      {
+        "id": "eg_ACT32F2C38D4ZR8BP2QVAET37D",
+        "source": "nd_56Z4XQ44DR7YDTG2752BFATE90",
+        "sourceHandle": "video",
+        "target": "nd_YP5PEDXWECYH0MTH240A0984XJ",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_HAVQ6QQ6C836RE7E587G9BSF4H",
+        "source": "nd_9BHZFFR686MJFMBRV6WAAWK2JW",
+        "sourceHandle": "text",
+        "target": "nd_45ZPC72A34B6K6QT9Z2JQ7CX8S",
+        "targetHandle": "parts__0"
+      },
+      {
+        "id": "eg_TS31VYP1M7JSR0ZMQ5XA0EHFR8",
+        "source": "nd_YP5PEDXWECYH0MTH240A0984XJ",
+        "sourceHandle": "text",
+        "target": "nd_45ZPC72A34B6K6QT9Z2JQ7CX8S",
+        "targetHandle": "parts__1"
+      },
+      {
+        "id": "eg_V790SFQ78S4785Y36PDCRM91QH",
+        "source": "nd_45ZPC72A34B6K6QT9Z2JQ7CX8S",
+        "sourceHandle": "text",
+        "target": "nd_KHXMHF3Y1AS6K33XGET43G0EJJ",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_DP6PDRJNJ7DW3J4B6PSV14JGST",
+        "source": "nd_KHXMHF3Y1AS6K33XGET43G0EJJ",
+        "sourceHandle": "text",
+        "target": "nd_6A84TP8FB42CQCXXR7XTGR025W",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_ZVEJXEHRN61APYCFPVSJARW9HQ",
+        "source": "nd_6A84TP8FB42CQCXXR7XTGR025W",
+        "sourceHandle": "text",
+        "target": "nd_BVRT9GB0TRVEVZDNET9Y15PHZ2",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_XSPZGFWMR65JD9HXE9252DRJDH",
+        "source": "nd_56Z4XQ44DR7YDTG2752BFATE90",
+        "sourceHandle": "video",
+        "target": "nd_BVRT9GB0TRVEVZDNET9Y15PHZ2",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_84BFD5PPWWM4CKWM2V7W9JDXVT",
+        "source": "nd_BVRT9GB0TRVEVZDNET9Y15PHZ2",
+        "sourceHandle": "video",
+        "target": "nd_4AA8ECDM1M1H1A6KNJ9E3SS209",
+        "targetHandle": "videos__0"
+      }
+    ]
+  }
+}

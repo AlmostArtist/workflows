@@ -1,0 +1,365 @@
+{
+  "format": "vibe-workflow-export",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-20T07:05:22.000Z",
+  "doc": {
+    "name": "D \u2014 camera body relit onto cloud-scape at altitude (golden key)",
+    "nodes": [
+      {
+        "id": "nd_KBDTWQB0EWY7ZJQAVHHRHR84QC",
+        "kind": "image-input",
+        "position": {
+          "x": 0,
+          "y": 300
+        },
+        "config": {
+          "url": ""
+        },
+        "name": "Subject image"
+      },
+      {
+        "id": "nd_9AQF6A2W12Z2BA6R7VC1P8EKKJ",
+        "kind": "background-input",
+        "position": {
+          "x": 0,
+          "y": 560
+        },
+        "config": {
+          "urls": []
+        },
+        "name": "Destination plates"
+      },
+      {
+        "id": "nd_B0J7C2C1RZR2GN83877CZ0X9E0",
+        "kind": "prompt",
+        "position": {
+          "x": 0,
+          "y": 820
+        },
+        "config": {
+          "text": "RETOUCH BRIEF \u2014 edit before running.\nSubject: camera body\nDestination plate: cloud-scape at altitude (golden key)\nKeep: product geometry, colourway, label text\nChange: background, lighting direction, contact shadow, grade\nOutput: relit composite, upscaled, ready for catalogue use."
+        },
+        "name": "Retouch brief"
+      },
+      {
+        "id": "nd_3MBVNN070716C63GFYWX1QTJ1E",
+        "kind": "aspect-ratio-input",
+        "position": {
+          "x": 0,
+          "y": 1060
+        },
+        "config": {
+          "value": "16:9"
+        },
+        "name": "Output ratio"
+      },
+      {
+        "id": "nd_QXD6HANJPPNQN3RTKD7XNK8Q63",
+        "kind": "sticky-note",
+        "position": {
+          "x": 0,
+          "y": -60
+        },
+        "config": {
+          "text": "STAGE 1 \u2014 subject is cut out, destination plates come in separately, and the relight director reconciles them."
+        },
+        "name": "Stage 1"
+      },
+      {
+        "id": "nd_65R0WTMV6HKKRE0XBYMBNN97CH",
+        "kind": "sticky-note",
+        "position": {
+          "x": 2100,
+          "y": -60
+        },
+        "config": {
+          "text": "STAGE 2 \u2014 composite renders, then upscales before download."
+        },
+        "name": "Stage 2"
+      },
+      {
+        "id": "nd_NQ2XJG63404SPV078RPFXVTPP1",
+        "kind": "bg-remove",
+        "position": {
+          "x": 700,
+          "y": 300
+        },
+        "config": {},
+        "name": "Cut out subject"
+      },
+      {
+        "id": "nd_HXG956XS7ENBD4BXCM89W2CCCZ",
+        "kind": "download",
+        "position": {
+          "x": 2800,
+          "y": 420
+        },
+        "config": {
+          "appendable_slots": {
+            "images": 2
+          }
+        },
+        "name": "Composites"
+      },
+      {
+        "id": "nd_06QAQ7CQSY18FQRJ988BG2QDMQ",
+        "kind": "text-gen",
+        "position": {
+          "x": 1400,
+          "y": 180
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 1300,
+          "temperature": 0.47,
+          "system_prompt": "You are the compositing and relighting director placing a camera body into a new environment.\n\nINPUTS. Reference slot one is the cut-out subject with its background already removed; the remaining slots are the destination plate: cloud-scape at altitude (golden key).\n\nMATCH. Your prompt must force the subject's light to match the plate: state the key direction in degrees, the colour temperature difference, the shadow softness and length, and where the contact shadow grounds the object. A composite fails on contact shadow and edge light before anything else.\n\nCAMERA MATCH. Reconcile perspective and lens: 90mm tilt-shift at f/1.2, matching horizon height and the plate's depth of field falloff.\n\nINTEGRATION. Call for matching grain, matching chromatic aberration at the edges, spill light from the plate onto the subject, and a filmic grade with halation on the specular highlights.\n\nPRESERVE. Do not alter the subject's shape, colourway or printed label in any way.\n\nOUTPUT. Output exactly one prompt paragraph and nothing else \u2014 no labels, no lists, no explanation of your reasoning.\n\nVARIANT. This branch renders an overcast treatment with a soft wrap and a wide ambient occlusion.",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Relight director 1"
+      },
+      {
+        "id": "nd_XRMEJS4RAWJV41MTDZ5V0DBFJA",
+        "kind": "image-gen",
+        "position": {
+          "x": 2100,
+          "y": 180
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "1K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Reject any render where the contact shadow is missing, the edge light contradicts the plate's key direction, or the product geometry or label differs from the cut-out.",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "output_format": "png",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Composite 1"
+      },
+      {
+        "id": "nd_DE2Z6N9VZK5XFFZR3ACT9EN5HE",
+        "kind": "upscaler",
+        "position": {
+          "x": 2500,
+          "y": 180
+        },
+        "config": {
+          "model": "topaz",
+          "enhance_model": "Standard V2",
+          "output_format": "jpg",
+          "upscale_factor": "2x",
+          "face_enhancement": false,
+          "subject_detection": "None",
+          "face_enhancement_strength": 0.8,
+          "face_enhancement_creativity": 0
+        },
+        "name": "Upscale 1",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_WM5HQ2T2RKSASPF0WZPRPT7ERC",
+        "kind": "text-gen",
+        "position": {
+          "x": 1400,
+          "y": 600
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 1300,
+          "temperature": 0.47,
+          "system_prompt": "You are the compositing and relighting director placing a camera body into a new environment.\n\nINPUTS. Reference slot one is the cut-out subject with its background already removed; the remaining slots are the destination plate: cloud-scape at altitude (golden key).\n\nMATCH. Your prompt must force the subject's light to match the plate: state the key direction in degrees, the colour temperature difference, the shadow softness and length, and where the contact shadow grounds the object. A composite fails on contact shadow and edge light before anything else.\n\nCAMERA MATCH. Reconcile perspective and lens: 58mm vintage double-gauss at f/2.8, matching horizon height and the plate's depth of field falloff.\n\nINTEGRATION. Call for matching grain, matching chromatic aberration at the edges, spill light from the plate onto the subject, and a clean high-key grade with the whites pushed to the edge of clipping.\n\nPRESERVE. Do not alter the subject's shape, colourway or printed label in any way.\n\nOUTPUT. Output exactly one prompt paragraph and nothing else \u2014 no labels, no lists, no explanation of your reasoning.\n\nVARIANT. This branch renders a daylight-matched treatment with a hard contact shadow.",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Relight director 2"
+      },
+      {
+        "id": "nd_B1N74DC7M4BM6S11RJQV62TBZ8",
+        "kind": "image-gen",
+        "position": {
+          "x": 2100,
+          "y": 600
+        },
+        "config": {
+          "model": "gemini-3.1-flash-image-preview",
+          "quality": "auto",
+          "image_size": "1K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Reject any render where the contact shadow is missing, the edge light contradicts the plate's key direction, or the product geometry or label differs from the cut-out.",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "output_format": "png",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Composite 2"
+      },
+      {
+        "id": "nd_CRFYS846780DJVTSCVR24T2N10",
+        "kind": "upscaler",
+        "position": {
+          "x": 2500,
+          "y": 600
+        },
+        "config": {
+          "model": "topaz",
+          "enhance_model": "Standard V2",
+          "output_format": "jpg",
+          "upscale_factor": "2x",
+          "face_enhancement": false,
+          "subject_detection": "None",
+          "face_enhancement_strength": 0.8,
+          "face_enhancement_creativity": 0
+        },
+        "name": "Upscale 2",
+        "includeInOutput": true
+      }
+    ],
+    "edges": [
+      {
+        "id": "eg_2G8M1ATY06TYWJ68PE4QHBRCT6",
+        "source": "nd_KBDTWQB0EWY7ZJQAVHHRHR84QC",
+        "sourceHandle": "image",
+        "target": "nd_NQ2XJG63404SPV078RPFXVTPP1",
+        "targetHandle": "image"
+      },
+      {
+        "id": "eg_DYSQETD0KRVM2BYG6RYTHP5H0W",
+        "source": "nd_B0J7C2C1RZR2GN83877CZ0X9E0",
+        "sourceHandle": "text",
+        "target": "nd_06QAQ7CQSY18FQRJ988BG2QDMQ",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_ZNHG6QX9TJMR0XEK73N5P16FP6",
+        "source": "nd_NQ2XJG63404SPV078RPFXVTPP1",
+        "sourceHandle": "image",
+        "target": "nd_06QAQ7CQSY18FQRJ988BG2QDMQ",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_8D2FKC4YCBTQ1YEQCAX93YEQH5",
+        "source": "nd_9AQF6A2W12Z2BA6R7VC1P8EKKJ",
+        "sourceHandle": "images",
+        "target": "nd_06QAQ7CQSY18FQRJ988BG2QDMQ",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_KB8SE7GQB8Z6GJ1KCM7SH5Q7MS",
+        "source": "nd_06QAQ7CQSY18FQRJ988BG2QDMQ",
+        "sourceHandle": "text",
+        "target": "nd_XRMEJS4RAWJV41MTDZ5V0DBFJA",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_EJBVX4FKXG8DA8551142AHTJ4E",
+        "source": "nd_NQ2XJG63404SPV078RPFXVTPP1",
+        "sourceHandle": "image",
+        "target": "nd_XRMEJS4RAWJV41MTDZ5V0DBFJA",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_T6J9AVZSCEHWE22SBBRDGMZ3CY",
+        "source": "nd_9AQF6A2W12Z2BA6R7VC1P8EKKJ",
+        "sourceHandle": "images",
+        "target": "nd_XRMEJS4RAWJV41MTDZ5V0DBFJA",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_WK165R37SAYDDHKGNDGV57MQJ7",
+        "source": "nd_3MBVNN070716C63GFYWX1QTJ1E",
+        "sourceHandle": "value",
+        "target": "nd_XRMEJS4RAWJV41MTDZ5V0DBFJA",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_T61TQJ2VJABEDJR0G84MWAQ92Y",
+        "source": "nd_XRMEJS4RAWJV41MTDZ5V0DBFJA",
+        "sourceHandle": "image",
+        "target": "nd_DE2Z6N9VZK5XFFZR3ACT9EN5HE",
+        "targetHandle": "image"
+      },
+      {
+        "id": "eg_5RE3E34HNR21VPSSXK8AMD9H77",
+        "source": "nd_DE2Z6N9VZK5XFFZR3ACT9EN5HE",
+        "sourceHandle": "image",
+        "target": "nd_HXG956XS7ENBD4BXCM89W2CCCZ",
+        "targetHandle": "images__0"
+      },
+      {
+        "id": "eg_WQX960GZE8HSRZH4MZK1HXJZ4F",
+        "source": "nd_B0J7C2C1RZR2GN83877CZ0X9E0",
+        "sourceHandle": "text",
+        "target": "nd_WM5HQ2T2RKSASPF0WZPRPT7ERC",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_4WCSBF1YYERQ3WRX90QV4XRHQB",
+        "source": "nd_NQ2XJG63404SPV078RPFXVTPP1",
+        "sourceHandle": "image",
+        "target": "nd_WM5HQ2T2RKSASPF0WZPRPT7ERC",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_Q6FQS2ZG97PQCZJ5WZWRM88HQE",
+        "source": "nd_9AQF6A2W12Z2BA6R7VC1P8EKKJ",
+        "sourceHandle": "images",
+        "target": "nd_WM5HQ2T2RKSASPF0WZPRPT7ERC",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_B5K44XKY2KRX42Z4TTV7N2VSS2",
+        "source": "nd_WM5HQ2T2RKSASPF0WZPRPT7ERC",
+        "sourceHandle": "text",
+        "target": "nd_B1N74DC7M4BM6S11RJQV62TBZ8",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_J562TH72FG6SH3BTGNGJ3NASWN",
+        "source": "nd_NQ2XJG63404SPV078RPFXVTPP1",
+        "sourceHandle": "image",
+        "target": "nd_B1N74DC7M4BM6S11RJQV62TBZ8",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_TFERVP3KSYSHNCPA8XMVWR6KHA",
+        "source": "nd_9AQF6A2W12Z2BA6R7VC1P8EKKJ",
+        "sourceHandle": "images",
+        "target": "nd_B1N74DC7M4BM6S11RJQV62TBZ8",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_G5BQFQQ4AP0Y92E2CZ421YGNV0",
+        "source": "nd_3MBVNN070716C63GFYWX1QTJ1E",
+        "sourceHandle": "value",
+        "target": "nd_B1N74DC7M4BM6S11RJQV62TBZ8",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_3M9MMBKKESWRMCKEFQQ5DCDNA1",
+        "source": "nd_B1N74DC7M4BM6S11RJQV62TBZ8",
+        "sourceHandle": "image",
+        "target": "nd_CRFYS846780DJVTSCVR24T2N10",
+        "targetHandle": "image"
+      },
+      {
+        "id": "eg_50EXMC51GN0SR0CB9G9K3H2Y9T",
+        "source": "nd_CRFYS846780DJVTSCVR24T2N10",
+        "sourceHandle": "image",
+        "target": "nd_HXG956XS7ENBD4BXCM89W2CCCZ",
+        "targetHandle": "images__1"
+      }
+    ]
+  }
+}

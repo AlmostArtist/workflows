@@ -1,0 +1,737 @@
+{
+  "format": "vibe-workflow-export",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-16T19:15:04.000Z",
+  "doc": {
+    "name": "14 \u2014 Trend-Mined Beauty Set: scrape, abstract, rebuild",
+    "nodes": [
+      {
+        "id": "nd_00XG1KMGHPP901Z87RR547S4NM",
+        "kind": "sticky-note",
+        "position": {
+          "x": 0,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 1 \u2014 TREND MINING\nQuery is assembled from a fixed category stem plus a swappable trend lane, scraped, then randomised so every run pulls a fresh reference."
+        }
+      },
+      {
+        "id": "nd_VEVZY47RXW0FV81P2X4PVPHAT6",
+        "kind": "text-input",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "text": "beauty product current, editorial, tactile"
+        },
+        "name": "Query stem \u2014 category"
+      },
+      {
+        "id": "nd_155KJ0AADSJGMV5VQV0R8R4NAM",
+        "kind": "text-input",
+        "position": {
+          "x": 0,
+          "y": 340
+        },
+        "config": {
+          "text": "editorial beauty still life 2026 chrome and water"
+        },
+        "name": "Query lane \u2014 trend direction"
+      },
+      {
+        "id": "nd_1RS6XJ6R4EG3JMN2ZCPAE2ZYKJ",
+        "kind": "concat",
+        "position": {
+          "x": 760,
+          "y": 0
+        },
+        "config": {
+          "separator": " ",
+          "appendable_slots": {
+            "parts": 2
+          }
+        },
+        "name": "Query builder"
+      },
+      {
+        "id": "nd_YGVPGEDBPTKCRBXJVEV0AP01ZZ",
+        "kind": "pinterest-scraper",
+        "position": {
+          "x": 1520,
+          "y": 0
+        },
+        "config": {
+          "limit": 40
+        },
+        "name": "Pinterest trend scrape"
+      },
+      {
+        "id": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "kind": "image-randomizer",
+        "position": {
+          "x": 2280,
+          "y": 0
+        },
+        "config": {
+          "images": [],
+          "appendable_slots": {
+            "images": 1
+          }
+        },
+        "name": "Trend reference \u2014 randomised"
+      },
+      {
+        "id": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "kind": "reference-image-input",
+        "position": {
+          "x": 0,
+          "y": 680
+        },
+        "config": {
+          "url": ""
+        },
+        "name": "[HERO SKU] \u2014 product reference"
+      },
+      {
+        "id": "nd_8FK37NJ2BSXWPABQVBSJMSRXRQ",
+        "kind": "text-gen",
+        "position": {
+          "x": 760,
+          "y": 680
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 6000,
+          "temperature": 0.3,
+          "system_prompt": "ROLE\nYou are the lead brand analyst and product-forensics specialist for a commercial\nphotography studio working on the [BEAUTY BRAND] [HERO SKU] campaign for the global\nmarket. You are the first node in an automated pipeline: everything downstream\ninherits your description, so precision matters more than flourish.\n\nINPUT\nOne or more reference photographs of the product, wired into your reference\nimage slots. Treat them as the single source of truth. They may be phone shots,\nsupplier photos or existing catalogue frames of varying quality.\n\nOBJECTIVE\nProduce a locked, machine-readable product bible that every downstream art\ndirector and image generator will be bound by, so that six independently\ngenerated images still look like the same physical object.\n\nMETHOD\n1. Identify the object precisely: category (beauty product), form factor, closure or\n   opening mechanism, proportions expressed as ratios, and overall silhouette.\n2. Inventory every material zone separately. For each zone record: material\n   name, finish (matte / satin / gloss / brushed / knurled / woven), how light\n   behaves on it, and how it meets the neighbouring zone (seam, weld, stitch,\n   bezel, gasket).\n3. Read the colourway. Give each colour a plain name, an approximate hex value,\n   and where it sits on the object. Note any colour shift between lit and\n   shadow sides.\n4. Transcribe every piece of visible text and graphic EXACTLY as printed, and\n   record its position, scale relative to the product, alignment and typeface\n   character. Mark anything you cannot read as \"illegible \u2014 do not reproduce\".\n5. Note the hero feature the campaign must sell: staying visually current without copying anybody. Describe how it\n   is visually evidenced on the object itself.\n6. Flag every failure risk: parts a generator typically warps, symmetry that\n   must be preserved, reflective zones that will blow out, fine text that will\n   turn to mush.\n\nHARD CONSTRAINTS\n- Describe only what is visible. Never infer ingredients, specifications,\n  certifications, country of origin, pricing or claims.\n- Never beautify. If the reference shows a scuff, a seam misalignment or a\n  colour cast, record it and state whether it should be cleaned up.\n- Use metric measurements only when the reference gives you a scale cue.\n\nOUTPUT CONTRACT \u2014 return strict JSON, nothing else.\n{\n    \"product_identity\": \"one precise sentence naming the object\",\n    \"silhouette\": \"proportions, stance, and outline description\",\n    \"material_zones\": [{\"zone\": \"\", \"material\": \"\", \"finish\": \"\", \"light_behaviour\": \"\", \"meets_neighbour_by\": \"\"}],\n    \"colourway\": [{\"name\": \"\", \"approx_hex\": \"\", \"location\": \"\"}],\n    \"visible_text\": [{\"copy\": \"\", \"position\": \"\", \"scale\": \"\", \"type_character\": \"\"}],\n    \"hero_feature_evidence\": \"how the selling point is visible\",\n    \"locked_attributes\": [\"things that must never change across shots\"],\n    \"generation_risks\": [\"specific failure modes to guard against\"],\n    \"cleanup_notes\": [\"defects in the reference to remove\"]\n}\n\nSELF-CHECK BEFORE YOU OUTPUT\n1. Does every field in the output contract exist and is it non-empty?\n2. Is the JSON strictly valid, with no markdown fences and no commentary?\n3. Did you invent any brand text, claim, price, or certification? Remove it.\n4. Is every prompt inside the word budget?\n5. Would a production designer be able to shoot this exactly as written?\n",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        },
+        "name": "Product bible \u2014 forensic analyst"
+      },
+      {
+        "id": "nd_EQPMAK7BTFES1G26785KSJGNA0",
+        "kind": "sticky-note",
+        "position": {
+          "x": 3040,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 2 \u2014 TREND-INFORMED FRAMES\nEach lane abstracts the scraped reference into [BEAUTY BRAND]'s own visual language \u2014 structure borrowed, never the image."
+        }
+      },
+      {
+        "id": "nd_G31FWD07XY57YS80NJAKNSWY0E",
+        "kind": "text-gen",
+        "position": {
+          "x": 3040,
+          "y": 0
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4096,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are visual researcher 1 on the [BEAUTY BRAND] [HERO SKU] campaign, building one\nlane of a marketing-studio moodboard. Scraped trend imagery is wired into your\nreference slots.\n\nYOUR LANE: Hero three-quarter \u2014 the primary catalogue frame and paid-media hero; must read at thumbnail size\n\nOBJECTIVE\nTurn raw trend references into one generation prompt that expresses this lane\nin [BEAUTY BRAND]'s own visual language \u2014 borrowing the structural idea, never the\nspecific image.\n\nMETHOD\n1. Abstract the references: what is the underlying compositional idea, light\n   idea and colour idea? Write each in one line.\n2. Reject anything that is only borrowable as a copy \u2014 specific artwork,\n   recognisable people, brand marks, packaging designs, characters.\n3. Rebuild the abstracted idea around [HERO SKU] using palette soft blush, bone, chrome accent and\n   grade clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.\n4. State the one thing this lane does that the other lanes do not.\n\nNANO-BANANA (Gemini image) PROMPT-WRITING RULES \u2014 obey all of them\n- Write ONE continuous paragraph of 110-190 words. No bullet lists, no headings,\n  no markdown, no numbered shot lists inside the prompt itself.\n- Order the information the way the model reads best:\n  subject and its exact material description -> pose/placement/angle ->\n  lens and camera distance -> lighting design (key, fill, rim, practicals) ->\n  surface and background -> colour and grade -> finishing and texture notes.\n- Name real photographic hardware and real light shaping tools (85mm macro,\n  100mm tilt-shift, 1.2m octabox, strip softbox with grid, V-flat bounce,\n  scrim, gobo, polariser). The model responds to physical specificity.\n- Describe materials by their optical behaviour, not by adjectives: \"anodised\n  aluminium with a fine circular brush pattern that throws a narrow specular\n  streak\", not \"premium metal\".\n- State what stays LOCKED from the reference image: silhouette, proportions,\n  logo placement, typography, colourway, closure/seam detail, label copy.\n- Never invent brand text, taglines, certification marks, ingredient claims or\n  legal copy that is not visible in the reference. If text must appear, say\n  \"reproduce the existing label text exactly as shown in the reference\".\n- Ban list to include at the end of the paragraph, phrased naturally: no warped\n  geometry, no melted or re-drawn logo, no invented text, no plastic-looking\n  skin, no HDR halo, no duplicated product parts.\n\n\nOUTPUT CONTRACT \u2014 return strict JSON, nothing else.\n{\n    \"abstracted_idea\": {\"composition\": \"\", \"light\": \"\", \"colour\": \"\"},\n    \"image_prompt\": \"\",\n    \"lane_differentiator\": \"\",\n    \"negative_prompt\": \"\"\n}\n\nSELF-CHECK BEFORE YOU OUTPUT\n1. Does every field in the output contract exist and is it non-empty?\n2. Is the JSON strictly valid, with no markdown fences and no commentary?\n3. Did you invent any brand text, claim, price, or certification? Remove it.\n4. Is every prompt inside the word budget?\n5. Would a production designer be able to shoot this exactly as written?\n",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Lane 1 \u2014 Hero three-quarter"
+      },
+      {
+        "id": "nd_J9RS4NS18DVTSGTG2K3EFYVB3K",
+        "kind": "image-gen",
+        "position": {
+          "x": 3800,
+          "y": 0
+        },
+        "config": {
+          "model": "gemini-3.1-flash-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score this frame 1-10 against the brief. The product must match the reference exactly in silhouette, colourway, logo placement and label text. Required frame: Hero three-quarter. Required lighting: clamshell \u2014 large softbox above and white reflector below \u2014 for even wraparound light and a clean double catchlight, background separated by a gridded accent. Required surface: wet acrylic surface with fine water beading and a mirrored reflection beneath the pack. Reject and retry if the logo is re-drawn, any text is invented or garbled, product geometry is warped, there is an HDR halo, or the grade drifts from clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.",
+          "aspect_ratio": "4:5",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Frame 1 \u2014 Hero three-quarter",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_HD43CJ0V3XNYKH3AKDKR8HXZ7H",
+        "kind": "text-gen",
+        "position": {
+          "x": 3040,
+          "y": 340
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4096,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are visual researcher 2 on the [BEAUTY BRAND] [HERO SKU] campaign, building one\nlane of a marketing-studio moodboard. Scraped trend imagery is wired into your\nreference slots.\n\nYOUR LANE: Macro material detail \u2014 prove build quality and finish \u2014 the frame that answers 'what is it actually made of'\n\nOBJECTIVE\nTurn raw trend references into one generation prompt that expresses this lane\nin [BEAUTY BRAND]'s own visual language \u2014 borrowing the structural idea, never the\nspecific image.\n\nMETHOD\n1. Abstract the references: what is the underlying compositional idea, light\n   idea and colour idea? Write each in one line.\n2. Reject anything that is only borrowable as a copy \u2014 specific artwork,\n   recognisable people, brand marks, packaging designs, characters.\n3. Rebuild the abstracted idea around [HERO SKU] using palette soft blush, bone, chrome accent and\n   grade clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.\n4. State the one thing this lane does that the other lanes do not.\n\nNANO-BANANA (Gemini image) PROMPT-WRITING RULES \u2014 obey all of them\n- Write ONE continuous paragraph of 110-190 words. No bullet lists, no headings,\n  no markdown, no numbered shot lists inside the prompt itself.\n- Order the information the way the model reads best:\n  subject and its exact material description -> pose/placement/angle ->\n  lens and camera distance -> lighting design (key, fill, rim, practicals) ->\n  surface and background -> colour and grade -> finishing and texture notes.\n- Name real photographic hardware and real light shaping tools (85mm macro,\n  100mm tilt-shift, 1.2m octabox, strip softbox with grid, V-flat bounce,\n  scrim, gobo, polariser). The model responds to physical specificity.\n- Describe materials by their optical behaviour, not by adjectives: \"anodised\n  aluminium with a fine circular brush pattern that throws a narrow specular\n  streak\", not \"premium metal\".\n- State what stays LOCKED from the reference image: silhouette, proportions,\n  logo placement, typography, colourway, closure/seam detail, label copy.\n- Never invent brand text, taglines, certification marks, ingredient claims or\n  legal copy that is not visible in the reference. If text must appear, say\n  \"reproduce the existing label text exactly as shown in the reference\".\n- Ban list to include at the end of the paragraph, phrased naturally: no warped\n  geometry, no melted or re-drawn logo, no invented text, no plastic-looking\n  skin, no HDR halo, no duplicated product parts.\n\n\nOUTPUT CONTRACT \u2014 return strict JSON, nothing else.\n{\n    \"abstracted_idea\": {\"composition\": \"\", \"light\": \"\", \"colour\": \"\"},\n    \"image_prompt\": \"\",\n    \"lane_differentiator\": \"\",\n    \"negative_prompt\": \"\"\n}\n\nSELF-CHECK BEFORE YOU OUTPUT\n1. Does every field in the output contract exist and is it non-empty?\n2. Is the JSON strictly valid, with no markdown fences and no commentary?\n3. Did you invent any brand text, claim, price, or certification? Remove it.\n4. Is every prompt inside the word budget?\n5. Would a production designer be able to shoot this exactly as written?\n",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Lane 2 \u2014 Macro material detail"
+      },
+      {
+        "id": "nd_A2ETJFZNPA9KFKKMH2JEEDFK4Q",
+        "kind": "image-gen",
+        "position": {
+          "x": 3800,
+          "y": 340
+        },
+        "config": {
+          "model": "gemini-3.1-flash-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score this frame 1-10 against the brief. The product must match the reference exactly in silhouette, colourway, logo placement and label text. Required frame: Macro material detail. Required lighting: beauty dish with a sock at 30 degrees above the lens axis, silver reflector under the chin line, a subtle hair light from behind at half power. Required surface: soft sculptural plaster form curving up behind the product as both plinth and backdrop. Reject and retry if the logo is re-drawn, any text is invented or garbled, product geometry is warped, there is an HDR halo, or the grade drifts from clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.",
+          "aspect_ratio": "4:5",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Frame 2 \u2014 Macro material detail",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_PHXHC00W4XZ03E29MBPZD7C2QK",
+        "kind": "text-gen",
+        "position": {
+          "x": 3040,
+          "y": 680
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4096,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are visual researcher 3 on the [BEAUTY BRAND] [HERO SKU] campaign, building one\nlane of a marketing-studio moodboard. Scraped trend imagery is wired into your\nreference slots.\n\nYOUR LANE: Levitation composite \u2014 modern editorial frame with weightlessness \u2014 built to stop a scroll\n\nOBJECTIVE\nTurn raw trend references into one generation prompt that expresses this lane\nin [BEAUTY BRAND]'s own visual language \u2014 borrowing the structural idea, never the\nspecific image.\n\nMETHOD\n1. Abstract the references: what is the underlying compositional idea, light\n   idea and colour idea? Write each in one line.\n2. Reject anything that is only borrowable as a copy \u2014 specific artwork,\n   recognisable people, brand marks, packaging designs, characters.\n3. Rebuild the abstracted idea around [HERO SKU] using palette soft blush, bone, chrome accent and\n   grade clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.\n4. State the one thing this lane does that the other lanes do not.\n\nNANO-BANANA (Gemini image) PROMPT-WRITING RULES \u2014 obey all of them\n- Write ONE continuous paragraph of 110-190 words. No bullet lists, no headings,\n  no markdown, no numbered shot lists inside the prompt itself.\n- Order the information the way the model reads best:\n  subject and its exact material description -> pose/placement/angle ->\n  lens and camera distance -> lighting design (key, fill, rim, practicals) ->\n  surface and background -> colour and grade -> finishing and texture notes.\n- Name real photographic hardware and real light shaping tools (85mm macro,\n  100mm tilt-shift, 1.2m octabox, strip softbox with grid, V-flat bounce,\n  scrim, gobo, polariser). The model responds to physical specificity.\n- Describe materials by their optical behaviour, not by adjectives: \"anodised\n  aluminium with a fine circular brush pattern that throws a narrow specular\n  streak\", not \"premium metal\".\n- State what stays LOCKED from the reference image: silhouette, proportions,\n  logo placement, typography, colourway, closure/seam detail, label copy.\n- Never invent brand text, taglines, certification marks, ingredient claims or\n  legal copy that is not visible in the reference. If text must appear, say\n  \"reproduce the existing label text exactly as shown in the reference\".\n- Ban list to include at the end of the paragraph, phrased naturally: no warped\n  geometry, no melted or re-drawn logo, no invented text, no plastic-looking\n  skin, no HDR halo, no duplicated product parts.\n\n\nOUTPUT CONTRACT \u2014 return strict JSON, nothing else.\n{\n    \"abstracted_idea\": {\"composition\": \"\", \"light\": \"\", \"colour\": \"\"},\n    \"image_prompt\": \"\",\n    \"lane_differentiator\": \"\",\n    \"negative_prompt\": \"\"\n}\n\nSELF-CHECK BEFORE YOU OUTPUT\n1. Does every field in the output contract exist and is it non-empty?\n2. Is the JSON strictly valid, with no markdown fences and no commentary?\n3. Did you invent any brand text, claim, price, or certification? Remove it.\n4. Is every prompt inside the word budget?\n5. Would a production designer be able to shoot this exactly as written?\n",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Lane 3 \u2014 Levitation composite"
+      },
+      {
+        "id": "nd_4WHD8VX1BQ907VH7NGHNWG1V70",
+        "kind": "image-gen",
+        "position": {
+          "x": 3800,
+          "y": 680
+        },
+        "config": {
+          "model": "gemini-3.1-flash-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score this frame 1-10 against the brief. The product must match the reference exactly in silhouette, colourway, logo placement and label text. Required frame: Levitation composite. Required lighting: ring-adjacent frontal light for a flat glossy finish with a perfect circular highlight on the cap, background lit in a smooth vertical gradient. Required surface: silk in the campaign accent colour, gathered into soft folds that catch gradient light. Reject and retry if the logo is re-drawn, any text is invented or garbled, product geometry is warped, there is an HDR halo, or the grade drifts from clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.",
+          "aspect_ratio": "4:5",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Frame 3 \u2014 Levitation composite",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_WKWXRWP92X2EF1B0JXGJDTVVNS",
+        "kind": "text-gen",
+        "position": {
+          "x": 3040,
+          "y": 1020
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4096,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are visual researcher 4 on the [BEAUTY BRAND] [HERO SKU] campaign, building one\nlane of a marketing-studio moodboard. Scraped trend imagery is wired into your\nreference slots.\n\nYOUR LANE: Closure and mechanism detail \u2014 prove the mechanism works \u2014 the frame that removes the final purchase objection\n\nOBJECTIVE\nTurn raw trend references into one generation prompt that expresses this lane\nin [BEAUTY BRAND]'s own visual language \u2014 borrowing the structural idea, never the\nspecific image.\n\nMETHOD\n1. Abstract the references: what is the underlying compositional idea, light\n   idea and colour idea? Write each in one line.\n2. Reject anything that is only borrowable as a copy \u2014 specific artwork,\n   recognisable people, brand marks, packaging designs, characters.\n3. Rebuild the abstracted idea around [HERO SKU] using palette soft blush, bone, chrome accent and\n   grade clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.\n4. State the one thing this lane does that the other lanes do not.\n\nNANO-BANANA (Gemini image) PROMPT-WRITING RULES \u2014 obey all of them\n- Write ONE continuous paragraph of 110-190 words. No bullet lists, no headings,\n  no markdown, no numbered shot lists inside the prompt itself.\n- Order the information the way the model reads best:\n  subject and its exact material description -> pose/placement/angle ->\n  lens and camera distance -> lighting design (key, fill, rim, practicals) ->\n  surface and background -> colour and grade -> finishing and texture notes.\n- Name real photographic hardware and real light shaping tools (85mm macro,\n  100mm tilt-shift, 1.2m octabox, strip softbox with grid, V-flat bounce,\n  scrim, gobo, polariser). The model responds to physical specificity.\n- Describe materials by their optical behaviour, not by adjectives: \"anodised\n  aluminium with a fine circular brush pattern that throws a narrow specular\n  streak\", not \"premium metal\".\n- State what stays LOCKED from the reference image: silhouette, proportions,\n  logo placement, typography, colourway, closure/seam detail, label copy.\n- Never invent brand text, taglines, certification marks, ingredient claims or\n  legal copy that is not visible in the reference. If text must appear, say\n  \"reproduce the existing label text exactly as shown in the reference\".\n- Ban list to include at the end of the paragraph, phrased naturally: no warped\n  geometry, no melted or re-drawn logo, no invented text, no plastic-looking\n  skin, no HDR halo, no duplicated product parts.\n\n\nOUTPUT CONTRACT \u2014 return strict JSON, nothing else.\n{\n    \"abstracted_idea\": {\"composition\": \"\", \"light\": \"\", \"colour\": \"\"},\n    \"image_prompt\": \"\",\n    \"lane_differentiator\": \"\",\n    \"negative_prompt\": \"\"\n}\n\nSELF-CHECK BEFORE YOU OUTPUT\n1. Does every field in the output contract exist and is it non-empty?\n2. Is the JSON strictly valid, with no markdown fences and no commentary?\n3. Did you invent any brand text, claim, price, or certification? Remove it.\n4. Is every prompt inside the word budget?\n5. Would a production designer be able to shoot this exactly as written?\n",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Lane 4 \u2014 Closure and mechanism detail"
+      },
+      {
+        "id": "nd_5GC7TZGEYG9W3Q3GZKQF6PET75",
+        "kind": "image-gen",
+        "position": {
+          "x": 3800,
+          "y": 1020
+        },
+        "config": {
+          "model": "gemini-3.1-flash-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score this frame 1-10 against the brief. The product must match the reference exactly in silhouette, colourway, logo placement and label text. Required frame: Closure and mechanism detail. Required lighting: gelled dual-tone setup \u2014 soft rose from the left, clean neutral from the right \u2014 meeting across the front face of the pack. Required surface: frosted glass shelf glowing faintly from underneath. Reject and retry if the logo is re-drawn, any text is invented or garbled, product geometry is warped, there is an HDR halo, or the grade drifts from clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.",
+          "aspect_ratio": "4:5",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Frame 4 \u2014 Closure and mechanism detail",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_RQFGX2R1W3ACD4N2ZP0CHANN8W",
+        "kind": "text-gen",
+        "position": {
+          "x": 3040,
+          "y": 1360
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4096,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are visual researcher 5 on the [BEAUTY BRAND] [HERO SKU] campaign, building one\nlane of a marketing-studio moodboard. Scraped trend imagery is wired into your\nreference slots.\n\nYOUR LANE: Lifestyle in use \u2014 place the product in the buyer's real context and carry the emotional register of the brand\n\nOBJECTIVE\nTurn raw trend references into one generation prompt that expresses this lane\nin [BEAUTY BRAND]'s own visual language \u2014 borrowing the structural idea, never the\nspecific image.\n\nMETHOD\n1. Abstract the references: what is the underlying compositional idea, light\n   idea and colour idea? Write each in one line.\n2. Reject anything that is only borrowable as a copy \u2014 specific artwork,\n   recognisable people, brand marks, packaging designs, characters.\n3. Rebuild the abstracted idea around [HERO SKU] using palette soft blush, bone, chrome accent and\n   grade clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.\n4. State the one thing this lane does that the other lanes do not.\n\nNANO-BANANA (Gemini image) PROMPT-WRITING RULES \u2014 obey all of them\n- Write ONE continuous paragraph of 110-190 words. No bullet lists, no headings,\n  no markdown, no numbered shot lists inside the prompt itself.\n- Order the information the way the model reads best:\n  subject and its exact material description -> pose/placement/angle ->\n  lens and camera distance -> lighting design (key, fill, rim, practicals) ->\n  surface and background -> colour and grade -> finishing and texture notes.\n- Name real photographic hardware and real light shaping tools (85mm macro,\n  100mm tilt-shift, 1.2m octabox, strip softbox with grid, V-flat bounce,\n  scrim, gobo, polariser). The model responds to physical specificity.\n- Describe materials by their optical behaviour, not by adjectives: \"anodised\n  aluminium with a fine circular brush pattern that throws a narrow specular\n  streak\", not \"premium metal\".\n- State what stays LOCKED from the reference image: silhouette, proportions,\n  logo placement, typography, colourway, closure/seam detail, label copy.\n- Never invent brand text, taglines, certification marks, ingredient claims or\n  legal copy that is not visible in the reference. If text must appear, say\n  \"reproduce the existing label text exactly as shown in the reference\".\n- Ban list to include at the end of the paragraph, phrased naturally: no warped\n  geometry, no melted or re-drawn logo, no invented text, no plastic-looking\n  skin, no HDR halo, no duplicated product parts.\n\n\nOUTPUT CONTRACT \u2014 return strict JSON, nothing else.\n{\n    \"abstracted_idea\": {\"composition\": \"\", \"light\": \"\", \"colour\": \"\"},\n    \"image_prompt\": \"\",\n    \"lane_differentiator\": \"\",\n    \"negative_prompt\": \"\"\n}\n\nSELF-CHECK BEFORE YOU OUTPUT\n1. Does every field in the output contract exist and is it non-empty?\n2. Is the JSON strictly valid, with no markdown fences and no commentary?\n3. Did you invent any brand text, claim, price, or certification? Remove it.\n4. Is every prompt inside the word budget?\n5. Would a production designer be able to shoot this exactly as written?\n",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Lane 5 \u2014 Lifestyle in use"
+      },
+      {
+        "id": "nd_0BZ7Z25E75RXJD68208K3FDSCS",
+        "kind": "image-gen",
+        "position": {
+          "x": 3800,
+          "y": 1360
+        },
+        "config": {
+          "model": "gemini-3.1-flash-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score this frame 1-10 against the brief. The product must match the reference exactly in silhouette, colourway, logo placement and label text. Required frame: Lifestyle in use. Required lighting: high-key setup with the background blown to pure paper white and the product held one stop down so the edges still read. Required surface: sand-textured stone in a warm neutral, matte and light-absorbing. Reject and retry if the logo is re-drawn, any text is invented or garbled, product geometry is warped, there is an HDR halo, or the grade drifts from clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.",
+          "aspect_ratio": "4:5",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Frame 5 \u2014 Lifestyle in use",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_E67NP69PMMEEWS5PSEXWYQTX5F",
+        "kind": "text-gen",
+        "position": {
+          "x": 3040,
+          "y": 1700
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4096,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are visual researcher 6 on the [BEAUTY BRAND] [HERO SKU] campaign, building one\nlane of a marketing-studio moodboard. Scraped trend imagery is wired into your\nreference slots.\n\nYOUR LANE: Low-key dramatic \u2014 the campaign frame \u2014 mood over information, built for social and OOH\n\nOBJECTIVE\nTurn raw trend references into one generation prompt that expresses this lane\nin [BEAUTY BRAND]'s own visual language \u2014 borrowing the structural idea, never the\nspecific image.\n\nMETHOD\n1. Abstract the references: what is the underlying compositional idea, light\n   idea and colour idea? Write each in one line.\n2. Reject anything that is only borrowable as a copy \u2014 specific artwork,\n   recognisable people, brand marks, packaging designs, characters.\n3. Rebuild the abstracted idea around [HERO SKU] using palette soft blush, bone, chrome accent and\n   grade clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.\n4. State the one thing this lane does that the other lanes do not.\n\nNANO-BANANA (Gemini image) PROMPT-WRITING RULES \u2014 obey all of them\n- Write ONE continuous paragraph of 110-190 words. No bullet lists, no headings,\n  no markdown, no numbered shot lists inside the prompt itself.\n- Order the information the way the model reads best:\n  subject and its exact material description -> pose/placement/angle ->\n  lens and camera distance -> lighting design (key, fill, rim, practicals) ->\n  surface and background -> colour and grade -> finishing and texture notes.\n- Name real photographic hardware and real light shaping tools (85mm macro,\n  100mm tilt-shift, 1.2m octabox, strip softbox with grid, V-flat bounce,\n  scrim, gobo, polariser). The model responds to physical specificity.\n- Describe materials by their optical behaviour, not by adjectives: \"anodised\n  aluminium with a fine circular brush pattern that throws a narrow specular\n  streak\", not \"premium metal\".\n- State what stays LOCKED from the reference image: silhouette, proportions,\n  logo placement, typography, colourway, closure/seam detail, label copy.\n- Never invent brand text, taglines, certification marks, ingredient claims or\n  legal copy that is not visible in the reference. If text must appear, say\n  \"reproduce the existing label text exactly as shown in the reference\".\n- Ban list to include at the end of the paragraph, phrased naturally: no warped\n  geometry, no melted or re-drawn logo, no invented text, no plastic-looking\n  skin, no HDR halo, no duplicated product parts.\n\n\nOUTPUT CONTRACT \u2014 return strict JSON, nothing else.\n{\n    \"abstracted_idea\": {\"composition\": \"\", \"light\": \"\", \"colour\": \"\"},\n    \"image_prompt\": \"\",\n    \"lane_differentiator\": \"\",\n    \"negative_prompt\": \"\"\n}\n\nSELF-CHECK BEFORE YOU OUTPUT\n1. Does every field in the output contract exist and is it non-empty?\n2. Is the JSON strictly valid, with no markdown fences and no commentary?\n3. Did you invent any brand text, claim, price, or certification? Remove it.\n4. Is every prompt inside the word budget?\n5. Would a production designer be able to shoot this exactly as written?\n",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Lane 6 \u2014 Low-key dramatic"
+      },
+      {
+        "id": "nd_GZQ3KHCHBNFDDDWF1964XCGSC8",
+        "kind": "image-gen",
+        "position": {
+          "x": 3800,
+          "y": 1700
+        },
+        "config": {
+          "model": "gemini-3.1-flash-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score this frame 1-10 against the brief. The product must match the reference exactly in silhouette, colourway, logo placement and label text. Required frame: Low-key dramatic. Required lighting: wet-look setup: hard gridded key with a fine mist pass on the surface so each droplet carries its own specular point. Required surface: clean gradient sweep from pale blush at the base to bone white at the top. Reject and retry if the logo is re-drawn, any text is invented or garbled, product geometry is warped, there is an HDR halo, or the grade drifts from clean neutral base, film-like highlight roll-off, black point lifted 3 points, restrained saturation with the brand accent left fully saturated.",
+          "aspect_ratio": "4:5",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Frame 6 \u2014 Low-key dramatic",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_DMW8SYJ8Z3CBFQD5QSG6HVGC1F",
+        "kind": "download",
+        "position": {
+          "x": 4560,
+          "y": 340
+        },
+        "config": {
+          "appendable_slots": {
+            "images": 6
+          }
+        },
+        "name": "Download \u2014 final deliverables"
+      }
+    ],
+    "edges": [
+      {
+        "id": "eg_K2MTS9Y1T8ZXQBHDDJ67436GAS",
+        "source": "nd_VEVZY47RXW0FV81P2X4PVPHAT6",
+        "sourceHandle": "text",
+        "target": "nd_1RS6XJ6R4EG3JMN2ZCPAE2ZYKJ",
+        "targetHandle": "parts__0"
+      },
+      {
+        "id": "eg_JHEYEBZNSVMA6Z6K081ZKK530J",
+        "source": "nd_155KJ0AADSJGMV5VQV0R8R4NAM",
+        "sourceHandle": "text",
+        "target": "nd_1RS6XJ6R4EG3JMN2ZCPAE2ZYKJ",
+        "targetHandle": "parts__1"
+      },
+      {
+        "id": "eg_9NDM9NMYHBZJYP5A1BET63032M",
+        "source": "nd_1RS6XJ6R4EG3JMN2ZCPAE2ZYKJ",
+        "sourceHandle": "text",
+        "target": "nd_YGVPGEDBPTKCRBXJVEV0AP01ZZ",
+        "targetHandle": "query"
+      },
+      {
+        "id": "eg_AKV923860WCWMZ9NM2JZRZP04W",
+        "source": "nd_YGVPGEDBPTKCRBXJVEV0AP01ZZ",
+        "sourceHandle": "images",
+        "target": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "targetHandle": "images__0"
+      },
+      {
+        "id": "eg_RVPVQGSZ7E53Q6WY88G2KXXJZ7",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_8FK37NJ2BSXWPABQVBSJMSRXRQ",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_MGS0JG32684FNS33GN7A94D856",
+        "source": "nd_8FK37NJ2BSXWPABQVBSJMSRXRQ",
+        "sourceHandle": "text",
+        "target": "nd_G31FWD07XY57YS80NJAKNSWY0E",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_PMSS5TR4HHH08QMDFDZPXS5HBZ",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_G31FWD07XY57YS80NJAKNSWY0E",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_W07HWSS112WED676V1MQ8Y7YCM",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_G31FWD07XY57YS80NJAKNSWY0E",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_FR0YSYNAZQDKZ0JFS1K36S89NH",
+        "source": "nd_G31FWD07XY57YS80NJAKNSWY0E",
+        "sourceHandle": "text",
+        "target": "nd_J9RS4NS18DVTSGTG2K3EFYVB3K",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_8X6K2E01TTRWFPR26WG031502W",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_J9RS4NS18DVTSGTG2K3EFYVB3K",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_WMZS421M49ZPX3BP552T787MH8",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_J9RS4NS18DVTSGTG2K3EFYVB3K",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_BMKN36DFSNPRVKTREA9GX6V6MF",
+        "source": "nd_8FK37NJ2BSXWPABQVBSJMSRXRQ",
+        "sourceHandle": "text",
+        "target": "nd_HD43CJ0V3XNYKH3AKDKR8HXZ7H",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_33PNTN8T12TXFPXSXDXSTP1T7B",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_HD43CJ0V3XNYKH3AKDKR8HXZ7H",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_0AMG4CMC3QKGSR7PNJ766J5136",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_HD43CJ0V3XNYKH3AKDKR8HXZ7H",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_C60F30B30N4V01T5HH4FERKDT9",
+        "source": "nd_HD43CJ0V3XNYKH3AKDKR8HXZ7H",
+        "sourceHandle": "text",
+        "target": "nd_A2ETJFZNPA9KFKKMH2JEEDFK4Q",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_DWT521FQ728KY4EW0H16E8FE8Q",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_A2ETJFZNPA9KFKKMH2JEEDFK4Q",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_6B1Q4JPTYR3WX43GBY5BYZTCHS",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_A2ETJFZNPA9KFKKMH2JEEDFK4Q",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_1181B3BX534XWW06QEMERFASNW",
+        "source": "nd_8FK37NJ2BSXWPABQVBSJMSRXRQ",
+        "sourceHandle": "text",
+        "target": "nd_PHXHC00W4XZ03E29MBPZD7C2QK",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_8VKCFEENF96V3C6RNDFCVVGFBK",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_PHXHC00W4XZ03E29MBPZD7C2QK",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_S6EB46Y9Z0XT62CFDV2A1MK40J",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_PHXHC00W4XZ03E29MBPZD7C2QK",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_P636HQ3CCNX86S90VT620W1GQE",
+        "source": "nd_PHXHC00W4XZ03E29MBPZD7C2QK",
+        "sourceHandle": "text",
+        "target": "nd_4WHD8VX1BQ907VH7NGHNWG1V70",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_PHZB2A9630K9QS75MHME6A1HXK",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_4WHD8VX1BQ907VH7NGHNWG1V70",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_KFBQ7RCJ2GSN7813TSQV9JBZ7P",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_4WHD8VX1BQ907VH7NGHNWG1V70",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_7Y4A0WH5QB8WC42YFR3VZZWSER",
+        "source": "nd_8FK37NJ2BSXWPABQVBSJMSRXRQ",
+        "sourceHandle": "text",
+        "target": "nd_WKWXRWP92X2EF1B0JXGJDTVVNS",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_VDGHXGG4D1C96S03NR5E98HF8Q",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_WKWXRWP92X2EF1B0JXGJDTVVNS",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_5S2FNDGFCMXGZ6QJ5M256SZPNK",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_WKWXRWP92X2EF1B0JXGJDTVVNS",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_X1ECV9H2J1HZ1K8J4D2ZKSYPXZ",
+        "source": "nd_WKWXRWP92X2EF1B0JXGJDTVVNS",
+        "sourceHandle": "text",
+        "target": "nd_5GC7TZGEYG9W3Q3GZKQF6PET75",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_QBCMDEQ2ZEX1KJ771DJ3T0F049",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_5GC7TZGEYG9W3Q3GZKQF6PET75",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_DE2FP5PN4SZY3GXMZASP9G31C8",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_5GC7TZGEYG9W3Q3GZKQF6PET75",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_JVHBY1N64WWPTH1JSM1TEZ2678",
+        "source": "nd_8FK37NJ2BSXWPABQVBSJMSRXRQ",
+        "sourceHandle": "text",
+        "target": "nd_RQFGX2R1W3ACD4N2ZP0CHANN8W",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_313FS7X5V55DBQ4TXJEFMWJW7T",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_RQFGX2R1W3ACD4N2ZP0CHANN8W",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_3HBW1A0B6SKAFN0XQS54RYVJXM",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_RQFGX2R1W3ACD4N2ZP0CHANN8W",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_JXAKQDETWD9DYRSVCH3CRP0GMA",
+        "source": "nd_RQFGX2R1W3ACD4N2ZP0CHANN8W",
+        "sourceHandle": "text",
+        "target": "nd_0BZ7Z25E75RXJD68208K3FDSCS",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_JKFRKVD2TYAD5KGS61SSZESMJZ",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_0BZ7Z25E75RXJD68208K3FDSCS",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_67332J7YF75HXYB7AJXX39ZTRG",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_0BZ7Z25E75RXJD68208K3FDSCS",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_1JB0VD1MEYD0SZ5K2W8CFPERE3",
+        "source": "nd_8FK37NJ2BSXWPABQVBSJMSRXRQ",
+        "sourceHandle": "text",
+        "target": "nd_E67NP69PMMEEWS5PSEXWYQTX5F",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_1FE4T6K2R4A0730QPAPPSWYY36",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_E67NP69PMMEEWS5PSEXWYQTX5F",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_8G5X3X60B4VZM9RSNBAQXBPJQQ",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_E67NP69PMMEEWS5PSEXWYQTX5F",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_RDFSPH1K63DMMAATF2E6HG0J0Y",
+        "source": "nd_E67NP69PMMEEWS5PSEXWYQTX5F",
+        "sourceHandle": "text",
+        "target": "nd_GZQ3KHCHBNFDDDWF1964XCGSC8",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_GFZJYK30SAHF31FJF5VD64X495",
+        "source": "nd_RQW0H9996PRM1W51N1DJP55T7Q",
+        "sourceHandle": "image",
+        "target": "nd_GZQ3KHCHBNFDDDWF1964XCGSC8",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_F83EC32XNSCT48Z6JAP0EPQBKV",
+        "source": "nd_ZYGAC4V770K3N96NAMSHRB9YVC",
+        "sourceHandle": "image",
+        "target": "nd_GZQ3KHCHBNFDDDWF1964XCGSC8",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_X7JQ5W3AJGFQ7C8HTESMWSBFX0",
+        "source": "nd_J9RS4NS18DVTSGTG2K3EFYVB3K",
+        "sourceHandle": "image",
+        "target": "nd_DMW8SYJ8Z3CBFQD5QSG6HVGC1F",
+        "targetHandle": "images__0"
+      },
+      {
+        "id": "eg_2P86HNJPN0PYTVS7DCT12W1TJN",
+        "source": "nd_A2ETJFZNPA9KFKKMH2JEEDFK4Q",
+        "sourceHandle": "image",
+        "target": "nd_DMW8SYJ8Z3CBFQD5QSG6HVGC1F",
+        "targetHandle": "images__1"
+      },
+      {
+        "id": "eg_C03FB8Z12T1BC9TES727G5CN9S",
+        "source": "nd_4WHD8VX1BQ907VH7NGHNWG1V70",
+        "sourceHandle": "image",
+        "target": "nd_DMW8SYJ8Z3CBFQD5QSG6HVGC1F",
+        "targetHandle": "images__2"
+      },
+      {
+        "id": "eg_T2TFY3YYQMNMB8VYSF3EZA6FV3",
+        "source": "nd_5GC7TZGEYG9W3Q3GZKQF6PET75",
+        "sourceHandle": "image",
+        "target": "nd_DMW8SYJ8Z3CBFQD5QSG6HVGC1F",
+        "targetHandle": "images__3"
+      },
+      {
+        "id": "eg_DDSH1T404AKNSFRSQ0V5S200T1",
+        "source": "nd_0BZ7Z25E75RXJD68208K3FDSCS",
+        "sourceHandle": "image",
+        "target": "nd_DMW8SYJ8Z3CBFQD5QSG6HVGC1F",
+        "targetHandle": "images__4"
+      },
+      {
+        "id": "eg_DD9P92ZR6EYZS9QCA4QJSXTPR5",
+        "source": "nd_GZQ3KHCHBNFDDDWF1964XCGSC8",
+        "sourceHandle": "image",
+        "target": "nd_DMW8SYJ8Z3CBFQD5QSG6HVGC1F",
+        "targetHandle": "images__5"
+      }
+    ]
+  }
+}

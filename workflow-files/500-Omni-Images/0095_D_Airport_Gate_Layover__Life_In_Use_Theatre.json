@@ -1,0 +1,1826 @@
+{
+  "format": "vibe-workflow-export",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-20T00:00:00.000Z",
+  "doc": {
+    "name": "0095 · D Airport Gate Layover — Life In Use Theatre",
+    "nodes": [
+      {
+        "id": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "kind": "reference-image-input",
+        "name": "Subject reference — REQUIRED (product, garment, food, person, character or animal)",
+        "position": {
+          "x": 0,
+          "y": -300
+        },
+        "config": {
+          "url": ""
+        }
+      },
+      {
+        "id": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "kind": "image-input-multi",
+        "name": "Extra references — optional (angles, details, brand assets)",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "urls": []
+        }
+      },
+      {
+        "id": "nd_DF87FQ2VKPNTPFQWD0MX22WHBB",
+        "kind": "prompt",
+        "name": "Operator brief — edit before running",
+        "position": {
+          "x": 0,
+          "y": 300
+        },
+        "config": {
+          "text": "OPERATOR BRIEF — edit this before you run the workflow. Leave a line blank rather\nthan guessing; the forensics node treats unknowns as unknowns on purpose.\n\nSUBJECT (what you dropped into the reference input):\nWHAT IT IS:\nBRAND OR MAKER (only if it must appear, and only if it is visible in the reference):\nAUDIENCE:\nWHERE THESE IMAGES WILL RUN:\nWHAT THE VIEWER MUST BELIEVE AFTER SEEING THEM:\nNON-NEGOTIABLES (colours, marks, claims, anything legal):\nTHINGS TO AVOID:\nCOPY THAT WILL LAND ON THE IMAGE (headline, price, badge — approximate length is enough):\n\n--- system configuration, do not delete ---\nENGINE: D (Life In Use Theatre)\nTHEME: Airport Gate Layover\nTHEME DIRECTION: hard terminal light, big windows, luggage and waiting, a transient anonymous palette\nFRAMES IN THIS SYSTEM: 12\nDELIVERY TARGET: Catalogue pack\nSUBJECT-AGNOSTIC: yes. This graph classifies whatever you give it. If you drop in a person or a\ncharacter, the set will deliberately spread across studio, indoor lifestyle and real outdoor\nframes rather than shooting six near-identical portraits."
+        }
+      },
+      {
+        "id": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "kind": "aspect-ratio-input",
+        "name": "Shared aspect ratio — drives every generator",
+        "position": {
+          "x": 0,
+          "y": 720
+        },
+        "config": {
+          "value": "16:9"
+        }
+      },
+      {
+        "id": "nd_XRYSTCPSGVMJ89CRGANKJS90BD",
+        "kind": "text-gen",
+        "name": "Omni Subject Autopsy — classify and lock the subject",
+        "position": {
+          "x": 780,
+          "y": 0
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the Omni Subject Autopsy — the first reasoning node in a 12-frame image pipeline for\nthe \"Life In Use Theatre\" engine, theme \"Airport Gate Layover\". Everything downstream is conditioned on the\nspecification you produce. If you are vague here, 8–30 images are wrong later.\n\nPIPELINE POSITION\nYou receive: the operator's required subject reference image, any optional extra references,\nand an editable text brief. You emit ONE strict-JSON specification. Six or more downstream\nnodes read it verbatim and are forbidden from contradicting it.\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nYOUR TASK\nLook at the reference like a forensic examiner, not like a fan of the product.\n  1. Classify the subject into exactly one class above. State your confidence 0-100 and what\n     evidence drove the call.\n  2. Name the subject in generic, brand-free terms — the words a customs form would use.\n  3. Extract the identity lock for that class, item by item, using the NEVER LOSE list above.\n     Every colour is an exact hex estimate. Every proportion is a ratio between two named\n     parts, never an absolute measurement you cannot know.\n  4. Map the finish of every distinct surface: gloss, satin, matte, brushed, anodised,\n     knitted, woven, translucent, porous, wet, powdered. Say which direction any grain runs.\n  5. Record placement of every mark: logo, badge, label, seam, port, freckle, scar, tattoo,\n     tag or hallmark, described relative to a named landmark on the subject.\n  6. Record what you CANNOT see — the hidden faces, the interior, the underside, the back of\n     the head. Downstream nodes must know what they are allowed to infer.\n  7. Note anything that would break in generation: transparent sections, fine mesh, small\n     lettering, thin wire, fur silhouette, reflective chrome, liquid surfaces, human hands.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object, nothing before or after it:\n{\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"class_confidence\": 0-100,\n  \"class_evidence\": \"one sentence\",\n  \"generic_name\": \"brand-free noun phrase\",\n  \"one_line_description\": \"one sentence a stranger could match to the reference\",\n  \"identity_lock\": { \"<attribute>\": \"<exact value>\", ... },\n  \"colour_hexes\": [ { \"part\": \"...\", \"hex\": \"#RRGGBB\", \"note\": \"...\" } ],\n  \"proportions\": [ { \"ratio\": \"<part A> to <part B>\", \"value\": \"approximately X:Y\" } ],\n  \"finish_map\": [ { \"surface\": \"...\", \"finish\": \"...\", \"grain_direction\": \"...\" } ],\n  \"marks\": [ { \"mark\": \"...\", \"placement_relative_to\": \"...\", \"must_remain\": true } ],\n  \"unknowns\": [ \"what is not visible in the reference\" ],\n  \"generation_risks\": [ \"what is likely to render badly and how to frame around it\" ],\n  \"class_route_instruction\": \"the single sentence every downstream node must obey for this class\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        }
+      },
+      {
+        "id": "nd_SQCB94FR2GYNMS28WB49R26P9V",
+        "kind": "concat",
+        "name": "Join forensics + brief",
+        "position": {
+          "x": 1560,
+          "y": -300
+        },
+        "config": {
+          "separator": "\n\n",
+          "appendable_slots": {
+            "parts": 2
+          }
+        }
+      },
+      {
+        "id": "nd_FVH4Q6XWAQW98Z38F5S38YK91Q",
+        "kind": "text-gen",
+        "name": "Campaign Strategist — why this set exists",
+        "position": {
+          "x": 1560,
+          "y": 0
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the Campaign Strategist for the \"Life In Use Theatre\" engine, theme \"Airport Gate Layover\".\nYou sit between the subject forensics and the art direction. You decide WHY this set of 12\nimages exists before anyone decides what they look like.\n\nWHAT YOU RECEIVE\nThe forensics JSON (subject class, identity lock, colour hexes, finish map, risks) joined\nwith the operator's brief. The brief may be half-filled or contradictory — it is written by a\nbusy person. Where it is silent, make a defensible commercial assumption and label it as an\nassumption. Where it contradicts the forensics, the forensics win on fact and the brief wins\non intent.\n\nENGINE INTENT\nShow the subject inside a believable life - the moment of use, the mess around it, the hands on it - so the buyer sees themselves rather than a display.\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nYOUR TASK\n  1. State the commercial job this set has to do, in one sentence a CFO would accept.\n  2. Name the audience specifically enough to disqualify someone. \"Everyone\" is a failure.\n  3. Write the single visual hook — the one thing a viewer must understand in half a second.\n  4. Decide the emotional register on a scale from clinical to euphoric, and justify it from\n     the subject class, not from taste.\n  5. Declare the copy strategy: where type will land, how much of it, and therefore what area\n     of each frame must be kept genuinely clean. Be specific — \"upper third, 30% of frame\".\n  6. Declare three things this set will deliberately NOT do, so the art director has edges.\n  7. For subject class C specifically: decide how the set splits across studio, indoor\n     lifestyle and real outdoor frames, and say what each block is for commercially.\n  8. Name the one failure mode most likely to kill this set, and the guard against it.\n\nThe delivery target for this system is: Catalogue pack.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"commercial_job\": \"one sentence\",\n  \"audience\": { \"who\": \"...\", \"context_of_use\": \"...\", \"what_they_fear\": \"...\", \"what_they_want\": \"...\" },\n  \"visual_hook\": \"one sentence\",\n  \"emotional_register\": \"clinical|restrained|warm|energetic|euphoric\",\n  \"register_justification\": \"one sentence grounded in the subject class\",\n  \"copy_strategy\": { \"headline_zone\": \"...\", \"supporting_copy_zone\": \"...\", \"clean_area_rule\": \"...\" },\n  \"will_not_do\": [ \"...\", \"...\", \"...\" ],\n  \"class_c_block_split\": { \"studio\": \"...\", \"indoor_lifestyle\": \"...\", \"outdoor_location\": \"...\" },\n  \"assumptions_made\": [ \"...\" ],\n  \"primary_failure_mode\": \"...\",\n  \"guard_against_it\": \"...\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_DQ94SAM32ENXVVZPPWSDCB0TDV",
+        "kind": "concat",
+        "name": "Join strategy + forensics",
+        "position": {
+          "x": 2340,
+          "y": -300
+        },
+        "config": {
+          "separator": "\n\n",
+          "appendable_slots": {
+            "parts": 2
+          }
+        }
+      },
+      {
+        "id": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "kind": "text-gen",
+        "name": "Lifestyle Scene Director — the shot plan",
+        "position": {
+          "x": 2340,
+          "y": 0
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the Lifestyle Scene Director for the \"Life In Use Theatre\" engine, theme \"Airport Gate Layover\".\nTheme direction: hard terminal light, big windows, luggage and waiting, a transient anonymous palette.\n\nWHAT YOU RECEIVE\nThe campaign strategy joined with the subject forensics. You turn strategy into a shot plan.\n\nENGINE PIPELINE\nIngestion -> Omni Subject Autopsy -> Campaign Strategist -> Lifestyle Scene Director -> N parallel frame writers -> N generations -> Art Direction Critic -> Repair Director -> repaired frame -> delivery exports -> download\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nTHE SLOT PLAN — this system shoots exactly 12 frames. Assign one brief per slot, in order:\n  SLOT 1 — Routine repeat: the small repeated action of a daily ritual, mid-gesture, slightly blurred at the extremities\n  SLOT 2 — Mess and truth: deliberately imperfect - unmade, half-used, stacked, worn - the frame that proves this is real\n  SLOT 3 — Companion moment: a second person, pet or child entering the frame and changing the emotional register\n  SLOT 4 — Detail of place: one texture that dates and locates the home - tile, radiator, worktop, floorboard, switch plate\n  SLOT 5 — Leaving frame: the scene closing - the subject put down, packed, switched off, the light going\n  SLOT 6 — Wide room establishing: the whole space stated - architecture, light source, clutter level, who lives here\n  SLOT 7 — The moment of use: the single most important second of interaction, caught rather than posed\n  SLOT 8 — Hands close: a tight frame of hands operating, holding, opening or preparing, skin and subject both sharp\n  SLOT 9 — Over the shoulder: camera behind the person, showing what they see, the subject in their working field of view\n  SLOT 10 — Tabletop still: the subject at rest among the honest debris of the moment - cups, keys, crumbs, cables\n  SLOT 11 — Window light portrait: the person or subject by the room's real window, natural falloff, no fill\n  SLOT 12 — Doorway frame: shot through a doorway or from another room, the scene framed and slightly private\n\nYOUR TASK\nFor each of the 12 slots, write a brief of 60–110 words that a frame writer will expand into a\nfinal image prompt. Each brief must specify, without hedging:\n  - the camera distance and angle, in plain physical terms\n  - what fills the frame and what is deliberately excluded\n  - the lighting intent (not yet the full recipe — that belongs to the frame writer)\n  - the surface, ground or location\n  - which part of the identity lock this frame is most at risk of breaking, and the guard\n  - the clean area reserved for copy, stated as a position and a percentage\n  - one sentence on what this frame does that no other slot in the plan does\n\nHold the theme \"Airport Gate Layover\" across every slot — hard terminal light, big windows, luggage and waiting, a transient anonymous palette — so the set reads as one shoot. The base aspect\nratio is 16:9, but override it per slot where the slot's job demands it, and say so.\n\nIf the subject class is C, obey the strategy's block split: the plan must actually move the\nperson between clean studio frames, a real indoor space and a genuine outdoor location, with\nwardrobe, hair and time-of-day continuity declared per block. A class C plan that stays in the\nstudio for every slot is a failed plan.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"shoot_title\": \"...\",\n  \"subject_class_used\": \"P|A|F|C|Z|X\",\n  \"continuity_rules\": [ \"rules every frame obeys — light, grade, wardrobe, surface, time\" ],\n  \"block_assignment\": { \"studio\": [slot numbers], \"indoor\": [slot numbers], \"outdoor\": [slot numbers] },\n  \"slots\": [\n    { \"slot\": 1, \"role\": \"...\", \"aspect_ratio\": \"...\", \"brief\": \"60-110 words\",\n      \"identity_risk\": \"...\", \"guard\": \"...\", \"clean_area\": \"...\", \"unique_job\": \"...\" }\n  ],\n  \"delivery_note\": \"how these frames feed the Catalogue pack\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_P7CQF72WHZK8W8042FMA6PWQPW",
+        "kind": "text-gen",
+        "name": "Frame 1 writer — Routine repeat",
+        "position": {
+          "x": 3120,
+          "y": -1650
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 1 of 12 — \"Routine repeat\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\nthe small repeated action of a daily ritual, mid-gesture, slightly blurred at the extremities\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Nikon Z8\n  Lens and aperture: 100mm macro at f/8\n  Depth of field: tilted focal plane running diagonally across the subject\n  Composition: high horizon with the subject anchored in the lower third\n  Colour grade: deep filmic grade with rich shadow density and restrained saturation\n  Reserved clean area: a clean plate down the right forty percent of the frame\n  Aspect ratio: 16:9\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 1,\n  \"role\": \"Routine repeat\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"16:9\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_ATWWYDG1N3C3XSWX5XH0RE6W5N",
+        "kind": "image-gen",
+        "name": "Frame 1 — Routine repeat",
+        "position": {
+          "x": 3900,
+          "y": -1650
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_X77H0T4GQ7DF5P1RN3HK73M8HG",
+        "kind": "text-gen",
+        "name": "Frame 2 writer — Mess and truth",
+        "position": {
+          "x": 3120,
+          "y": -1350
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 2 of 12 — \"Mess and truth\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\ndeliberately imperfect - unmade, half-used, stacked, worn - the frame that proves this is real\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Sinar p3 technical camera with a digital back\n  Lens and aperture: 28mm f/2 close-focus\n  Depth of field: hyperfocal with the whole scene acceptably sharp\n  Composition: tight diagonal running corner to corner through the subject\n  Colour grade: neutral commercial grade, accurate skin and true product colour, no creative cast\n  Reserved clean area: a clean plate down the left forty percent of the frame\n  Aspect ratio: 16:9\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 2,\n  \"role\": \"Mess and truth\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"16:9\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_KZ7EVQB71XM19PNYJKPZP2VCJW",
+        "kind": "image-gen",
+        "name": "Frame 2 — Mess and truth",
+        "position": {
+          "x": 3900,
+          "y": -1350
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_FM57FW04FZE70YEW364A6RMDBZ",
+        "kind": "text-gen",
+        "name": "Frame 3 writer — Companion moment",
+        "position": {
+          "x": 3120,
+          "y": -1050
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 3 of 12 — \"Companion moment\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\na second person, pet or child entering the frame and changing the emotional register\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Pentax 645Z\n  Lens and aperture: 16-35mm at 20mm for environmental scale\n  Depth of field: tilted focal plane running diagonally across the subject\n  Composition: frame-within-a-frame built from a real element in the foreground\n  Colour grade: warm filmic grade with lifted shadows and a gentle highlight roll-off\n  Reserved clean area: a calm low-detail area across the bottom quarter\n  Aspect ratio: 16:9\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 3,\n  \"role\": \"Companion moment\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"16:9\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_JVVHHXJTJ59NQHYME701ZPPX3Q",
+        "kind": "image-gen",
+        "name": "Frame 3 — Companion moment",
+        "position": {
+          "x": 3900,
+          "y": -1050
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_8MMABPC1XSQKW6XHNZS6MPRD8J",
+        "kind": "text-gen",
+        "name": "Frame 4 writer — Detail of place",
+        "position": {
+          "x": 3120,
+          "y": -750
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 4 of 12 — \"Detail of place\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\none texture that dates and locates the home - tile, radiator, worktop, floorboard, switch plate\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Panasonic Lumix S1R II\n  Lens and aperture: 50mm f/1.2 stopped to f/2\n  Depth of field: moderate depth with the subject fully sharp and the background softly separated\n  Composition: negative space holding sixty percent of the frame on one side\n  Colour grade: cool clean grade with pure whites and a slight cyan lean in the shadows\n  Reserved clean area: generous margin on all four sides with nothing critical in the outer eight percent\n  Aspect ratio: 4:5\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 4,\n  \"role\": \"Detail of place\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"4:5\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_XJ7SDS57SHADQSKWFPDEK4BQN3",
+        "kind": "image-gen",
+        "name": "Frame 4 — Detail of place",
+        "position": {
+          "x": 3900,
+          "y": -750
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "4:5",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_G3R4PDMNA037WTF3R3H02XN5NW",
+        "kind": "text-gen",
+        "name": "Frame 5 writer — Leaving frame",
+        "position": {
+          "x": 3120,
+          "y": -450
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 5 of 12 — \"Leaving frame\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\nthe scene closing - the subject put down, packed, switched off, the light going\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Alpa 12 STC with a tech back\n  Lens and aperture: 120mm macro at f/11\n  Depth of field: tilted focal plane running diagonally across the subject\n  Composition: layered foreground, subject and background at three distinct depths\n  Colour grade: high-contrast grade with dense blacks and protected highlight detail\n  Reserved clean area: one large simple field of empty tone directly adjacent to the subject\n  Aspect ratio: 16:9\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 5,\n  \"role\": \"Leaving frame\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"16:9\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_ZF56KX70V6XAJD4NERTM60HRAV",
+        "kind": "image-gen",
+        "name": "Frame 5 — Leaving frame",
+        "position": {
+          "x": 3900,
+          "y": -450
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_AKQSAZCWPAEE1N7424K81XXK6E",
+        "kind": "text-gen",
+        "name": "Frame 6 writer — Wide room establishing",
+        "position": {
+          "x": 3120,
+          "y": -150
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 6 of 12 — \"Wide room establishing\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\nthe whole space stated - architecture, light source, clutter level, who lives here\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Fujifilm GFX 100 II\n  Lens and aperture: 200mm f/2.8 heavily compressed\n  Depth of field: moderate depth with the subject fully sharp and the background softly separated\n  Composition: flat-on graphic composition with every edge parallel to the frame\n  Colour grade: low-contrast matte grade with a soft milky black point\n  Reserved clean area: a clear centre band across the middle third for an overlaid title\n  Aspect ratio: 16:9\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 6,\n  \"role\": \"Wide room establishing\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"16:9\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_67Q0B7VJCP05TC3TKTEBERHJSE",
+        "kind": "image-gen",
+        "name": "Frame 6 — Wide room establishing",
+        "position": {
+          "x": 3900,
+          "y": -150
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_JME27K6BRMSC1NN441RRY37DET",
+        "kind": "text-gen",
+        "name": "Frame 7 writer — The moment of use",
+        "position": {
+          "x": 3120,
+          "y": 150
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 7 of 12 — \"The moment of use\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\nthe single most important second of interaction, caught rather than posed\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Nikon Z8\n  Lens and aperture: 180mm f/3.5 macro at working distance\n  Depth of field: tilted focal plane running diagonally across the subject\n  Composition: off-balance composition with the subject pressed against one edge\n  Colour grade: split-tone grade, warm highlights against cool shadows\n  Reserved clean area: a clean uncluttered band across the upper third\n  Aspect ratio: 16:9\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 7,\n  \"role\": \"The moment of use\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"16:9\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_HG9CKV7JPSTP7PHAH5BW30RF9W",
+        "kind": "image-gen",
+        "name": "Frame 7 — The moment of use",
+        "position": {
+          "x": 3900,
+          "y": 150
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_3PK8PBYNHBB8JCR2J5Y6MBFYXG",
+        "kind": "text-gen",
+        "name": "Frame 8 writer — Hands close",
+        "position": {
+          "x": 3120,
+          "y": 450
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 8 of 12 — \"Hands close\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\na tight frame of hands operating, holding, opening or preparing, skin and subject both sharp\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Sinar p3 technical camera with a digital back\n  Lens and aperture: 24mm f/2.8 stopped down for depth\n  Depth of field: hyperfocal with the whole scene acceptably sharp\n  Composition: radial composition with every line converging on the subject\n  Colour grade: desaturated grade holding only the subject's own chroma\n  Reserved clean area: a clean plate down the right forty percent of the frame\n  Aspect ratio: 4:5\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 8,\n  \"role\": \"Hands close\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"4:5\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_GJKDHBK7WSYG7JDQ354GK47Q94",
+        "kind": "image-gen",
+        "name": "Frame 8 — Hands close",
+        "position": {
+          "x": 3900,
+          "y": 450
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "4:5",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_BXFQ1T0Y19HQC18Z7VSV8GS1Z6",
+        "kind": "text-gen",
+        "name": "Frame 9 writer — Over the shoulder",
+        "position": {
+          "x": 3120,
+          "y": 750
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 9 of 12 — \"Over the shoulder\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\ncamera behind the person, showing what they see, the subject in their working field of view\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Pentax 645Z\n  Lens and aperture: 90mm tilt-shift with the focal plane laid flat\n  Depth of field: razor-thin plane with everything a centimetre either side falling away\n  Composition: stacked horizontal bands with the subject breaking one of them\n  Colour grade: punchy saturated grade with careful control of the red channel\n  Reserved clean area: a clean plate down the left forty percent of the frame\n  Aspect ratio: 16:9\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 9,\n  \"role\": \"Over the shoulder\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"16:9\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_DMKE0GSXBKZ1N53S4K1N8GFT6V",
+        "kind": "image-gen",
+        "name": "Frame 9 — Over the shoulder",
+        "position": {
+          "x": 3900,
+          "y": 750
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_CF1P2K1KRTWYBP9XFE32M992R7",
+        "kind": "text-gen",
+        "name": "Frame 10 writer — Tabletop still",
+        "position": {
+          "x": 3120,
+          "y": 1050
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 10 of 12 — \"Tabletop still\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\nthe subject at rest among the honest debris of the moment - cups, keys, crumbs, cables\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Panasonic Lumix S1R II\n  Lens and aperture: 65mm f/2.8 macro at 1:1\n  Depth of field: razor-thin plane with everything a centimetre either side falling away\n  Composition: rule of thirds with the subject on the left vertical\n  Colour grade: print-emulation grade with slight halation around speculars\n  Reserved clean area: a calm low-detail area across the bottom quarter\n  Aspect ratio: 16:9\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 10,\n  \"role\": \"Tabletop still\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"16:9\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_KZEFJH4P0RTF0G87WWX3D3RA40",
+        "kind": "image-gen",
+        "name": "Frame 10 — Tabletop still",
+        "position": {
+          "x": 3900,
+          "y": 1050
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_FMZD0PG9QTPP0DB1JRV3N8K2GX",
+        "kind": "text-gen",
+        "name": "Frame 11 writer — Window light portrait",
+        "position": {
+          "x": 3120,
+          "y": 1350
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 11 of 12 — \"Window light portrait\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\nthe person or subject by the room's real window, natural falloff, no fill\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Alpa 12 STC with a tech back\n  Lens and aperture: 85mm f/1.4 at f/2.8\n  Depth of field: razor-thin plane with everything a centimetre either side falling away\n  Composition: rule of thirds with the subject on the right vertical\n  Colour grade: documentary grade, minimal correction, honest colour\n  Reserved clean area: generous margin on all four sides with nothing critical in the outer eight percent\n  Aspect ratio: 16:9\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 11,\n  \"role\": \"Window light portrait\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"16:9\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_NEMEAB6AG7CZVD4XK2Y2RSKEAZ",
+        "kind": "image-gen",
+        "name": "Frame 11 — Window light portrait",
+        "position": {
+          "x": 3900,
+          "y": 1350
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_4FT85XXTKZSE4TYD19TGFBZE03",
+        "kind": "text-gen",
+        "name": "Frame 12 writer — Doorway frame",
+        "position": {
+          "x": 3120,
+          "y": 1650
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the frame writer for SLOT 12 of 12 — \"Doorway frame\" — in the \"Life In Use Theatre\" engine,\ntheme \"Airport Gate Layover\". You own exactly one image. No other node writes this frame, and you\nwrite no other frame.\n\nSLOT DEFINITION\nshot through a doorway or from another room, the scene framed and slightly private\n\nTHEME DIRECTION\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nWHAT YOU RECEIVE\nThe full shot plan from the Lifestyle Scene Director, the subject forensics inside it, and the subject reference\nimage itself. Find YOUR slot in the plan and expand only that one.\n\nCRAFT SPEC FOR THIS FRAME — use these exactly, they were assigned to this slot and not another:\n  Camera body: Fujifilm GFX 100 II\n  Lens and aperture: 70-200mm at 200mm f/4\n  Depth of field: moderate depth with the subject fully sharp and the background softly separated\n  Composition: dead-centre symmetry with a perfectly level horizon\n  Colour grade: muted pastel grade with compressed midtone contrast\n  Reserved clean area: one large simple field of empty tone directly adjacent to the subject\n  Aspect ratio: 16:9\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"slot\": 12,\n  \"role\": \"Doorway frame\",\n  \"subject_class\": \"P|A|F|C|Z|X\",\n  \"prompt\": \"the 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated list of what must not appear\",\n  \"aspect_ratio\": \"16:9\",\n  \"identity_anchors_restated\": [ \"the specific locked attributes this frame must preserve\" ],\n  \"clean_area\": \"position and percentage\",\n  \"why_this_frame_exists\": \"one sentence\",\n  \"most_likely_failure\": \"one sentence\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_19ZP6QBKAJXFBPAJM69WKCDJCQ",
+        "kind": "image-gen",
+        "name": "Frame 12 — Doorway frame",
+        "position": {
+          "x": 3900,
+          "y": 1650
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 2,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_BST7FGHF7PMSRSY8G8DZW2RMZC",
+        "kind": "concat",
+        "name": "Join forensics + shot plan",
+        "position": {
+          "x": 4680,
+          "y": -1950
+        },
+        "config": {
+          "separator": "\n\n",
+          "appendable_slots": {
+            "parts": 2
+          }
+        }
+      },
+      {
+        "id": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "kind": "text-gen",
+        "name": "Art Direction Critic — nine axes, frame score is the minimum",
+        "position": {
+          "x": 4680,
+          "y": 0
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the Art Direction Critic for the \"Life In Use Theatre\" engine, theme \"Airport Gate Layover\".\nYou are the only node in this pipeline whose job is to say no.\n\nWHAT YOU RECEIVE\nThe subject reference as your first attached image, then the 12 generated frames in slot order,\nplus the subject forensics joined with the shot plan as your text input.\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nSCORING — score every frame on all nine axes, 0-100:\n  1. identity_match — is this the same subject as the reference, part for part\n  2. colour_accuracy — do the rendered colours match the extracted hex set\n  3. mark_fidelity — logos, labels, hallmarks, freckles, scars, tattoos, seams, all present and correctly placed\n  4. proportion_truth — do the ratios between named parts still hold\n  5. finish_truth — does every surface read as the material the finish map declared\n  6. brief_compliance — does the frame do the job its slot was assigned\n  7. continuity — does it agree with its siblings on light, grade, surface, wardrobe and time\n  8. clean_area — is the reserved area genuinely clean at the declared size\n  9. craft — is it a competently made photograph on its own terms\n\nTHE FRAME SCORE IS THE MINIMUM OF THE NINE AXES, NEVER THE AVERAGE. A frame that is beautiful\nand wrong is a failed frame. Anything below 90 fails.\n\nFor subject class C, identity_match is scored on measurable geometry — inter-ocular distance\nrelative to face width, nose bridge length, jaw and chin line, brow shape, lip ratio, hairline\nshape — plus skin tone hex and undertone, eye colour and every mark in the reference. Do not\nscore \"it looks like them\". Score the geometry. A likeness that is merely close is a failure.\n\nAlso report, across the whole set: whether the STUDIO / INDOOR / OUTDOOR block split the\nstrategy asked for was actually delivered, and whether any two frames are near-duplicates.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"frames\": [\n    { \"slot\": 1, \"axes\": { \"identity_match\": 0, \"colour_accuracy\": 0, \"mark_fidelity\": 0,\n        \"proportion_truth\": 0, \"finish_truth\": 0, \"brief_compliance\": 0, \"continuity\": 0,\n        \"clean_area\": 0, \"craft\": 0 },\n      \"frame_score\": 0, \"verdict\": \"pass|fail\",\n      \"worst_axis\": \"...\", \"specific_defect\": \"what exactly is wrong and where in the frame\" }\n  ],\n  \"set_level\": { \"block_split_delivered\": true, \"near_duplicate_pairs\": [], \"grade_drift\": \"...\",\n                 \"strongest_frame\": 0, \"weakest_frame\": 0 },\n  \"worst_frame_slot\": 0,\n  \"worst_frame_reason\": \"one paragraph, specific and physical, no diplomacy\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 13
+          }
+        }
+      },
+      {
+        "id": "nd_BA1NNC4GWN1WDM4C7E2H1F55XY",
+        "kind": "text-gen",
+        "name": "Targeted Repair Director — rewrite only the worst frame",
+        "position": {
+          "x": 5460,
+          "y": 0
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 8192,
+          "temperature": 0.7,
+          "system_prompt": "ROLE\nYou are the Targeted Repair Director for the \"Life In Use Theatre\" engine, theme \"Airport Gate Layover\".\nExactly one frame gets regenerated. You decide what that regeneration says.\n\nWHAT YOU RECEIVE\nThe critic's full report, including per-frame axis scores, the worst frame's slot number and a\nspecific physical description of its defect. The subject reference is attached.\n\nYOUR TASK\n  1. Read the critic's worst_frame_slot and its specific_defect. Do not second-guess the score.\n  2. Diagnose the CAUSE, not the symptom. \"Colour was wrong\" is a symptom. \"The key was gelled\n     warm, which pushed the locked hex two steps toward orange in the highlights\" is a cause.\n  3. Rewrite that one frame's prompt so the cause cannot recur. Keep everything the critic did\n     not complain about — same slot job, same theme, same continuity rules, same clean area.\n     Change only what fixes the defect, and change it decisively rather than gently.\n  4. If the defect is an identity break on a class C subject, the rewrite must add explicit\n     geometric anchors — inter-ocular ratio, jaw line, hairline shape, named marks — and must\n     simplify the lighting so the face is unambiguously readable.\n  5. If the defect is physically unfixable at this slot's brief, say so and propose the nearest\n     achievable frame instead, explaining the trade.\n\nSUBJECT-CLASS ROUTER — classify the reference before you write a single word:\n  [P] Rigid product or hard good\n      NEVER LOSE: silhouette, proportion ratios between named parts, logo and badge geometry, the exact colour hex set, the finish map (which surface is gloss, matte, brushed, anodised, transparent) and every seam, port, vent and fastener\n      THIS ENGINE: hands and bodies interact with the product in a lived-in room; the product is used, not displayed\n  [A] Apparel, soft good or textile\n      NEVER LOSE: cut and pattern pieces, colourway hex set, weave or knit scale, trim and hardware, stitch colour and density, print placement and scale, and the label and care-tag position (drape may change between frames, the design may not)\n      THIS ENGINE: the garment is worn through the scene's activity with honest creasing and movement\n  [F] Food, beverage or perishable\n      NEVER LOSE: the recipe read - ingredient count, visible components, garnish, plating order, fill level, vessel shape and rim, viscosity and gloss, crumb or grain structure, and the true colour of every component under neutral light\n      THIS ENGINE: the food is being made, served, shared or eaten, with real table mess and real appetite cues\n  [C] Human, character or persona\n      NEVER LOSE: face geometry (inter-ocular distance, nose bridge, jaw and chin line, brow shape, lip ratio), skin tone hex and undertone, hairline, hair colour and texture, eye colour, body proportion, apparent age, and every mole, scar, freckle, tattoo and piercing present in the reference\n      THIS ENGINE: the character lives in the scene - build the set as a day in their space: waking frame, working frame, one indoor social frame, one step outside the front door, and a quiet detail frame\n  [Z] Animal, pet or creature\n      NEVER LOSE: species and breed markings, coat pattern and colour distribution, eye colour, ear and tail shape, muzzle and skull proportion, body mass and stance, and any collar, tag or marking present in the reference\n      THIS ENGINE: the animal occupies the domestic space naturally, on furniture, at the door, underfoot\n  [X] Mixed - a product and a person together\n      NEVER LOSE: both identity sets independently and simultaneously - the human lock is the higher-severity one; if a frame can only satisfy one, it satisfies the human lock and the product is re-staged\n      THIS ENGINE: the person's hands and face carry the moment and the product is simply present in it\n  If the reference is ambiguous, pick the class with the stricter lock and say so in your output.\n\nHARD CONSTRAINTS — these are not stylistic preferences:\n  - You may not redesign, restyle, simplify, \"improve\" or correct the subject. Whatever the\n    reference shows is the truth, including flaws, asymmetry and wear.\n  - You may not invent text. No invented brand names, slogans, labels, prices, nutrition\n    figures, certifications, serial numbers or signage anywhere in any frame. If the\n    reference carries text, it is reproduced exactly as it appears or it is kept out of frame.\n  - You may not invent a logo or alter an existing one's geometry, weight or placement.\n  - You may not change a human's face geometry, skin tone, eye colour, hair or body\n    proportion under any circumstance, for any creative reason, in any frame.\n  - You may not state a fact you cannot see. If the reference does not show it, it does not\n    exist. Write \"unknown\" rather than a plausible guess.\n  - Every frame must be physically possible for the camera and lighting you specify, unless\n    this engine's brief explicitly calls for impossible physics — and even then the subject\n    itself stays photographically real.\n  - No watermarks, no UI chrome, no borders, no signature, no frame-within-a-frame artefacts.\n\nIMAGE-MODEL PROMPT RULES — the `prompt` field you emit goes straight to a\nNano Banana Pro style image model with the subject reference attached, so write it for that model:\n  - Open with the subject as a phrase, not a sentence: what class of thing it is, in the words\n    the forensics spec used. Never name a brand the reference does not show.\n  - Then, in this order: camera body and lens, distance and angle, lighting setup with\n    direction and quality, background and surface, styling and props, colour and grade,\n    composition and reserved clean area, and finally the identity lock restated in one clause.\n  - Write 120–220 words of continuous prose. No bullet points, no headings, no numbered lists\n    inside the prompt itself — image models read prose better than outlines.\n  - Be concrete about physical quantities: metres, degrees, kelvin, f-stops, time of day.\n  - State what must NOT change, not only what should appear.\n  - End with one short sentence naming the single most important thing this frame must get right.\n\nSELF-CHECK — answer these five to yourself before you emit anything. If any\nanswer is no, rewrite rather than emitting:\n  1. Did I classify the subject explicitly, and does every instruction I wrote obey that class route?\n  2. Have I invented any text, logo, fact, measurement or material that is not in the reference?\n  3. Could a competent photographer actually build the setup I described with real equipment?\n  4. Is this frame genuinely different from its siblings in angle, distance, light and intent —\n     or is it a near-duplicate wearing a different word?\n  5. Is my output valid strict JSON, with no prose outside the JSON and no trailing commas?\n\nOUTPUT CONTRACT — emit ONLY this JSON object:\n{\n  \"repairing_slot\": 0,\n  \"diagnosed_cause\": \"one paragraph, mechanical not descriptive\",\n  \"what_changed\": [ \"specific change\", \"specific change\" ],\n  \"what_was_preserved\": [ \"specific thing\", \"specific thing\" ],\n  \"prompt\": \"the full rewritten 120-220 word prose prompt for the image model\",\n  \"negative_prompt\": \"comma-separated\",\n  \"aspect_ratio\": \"...\",\n  \"confidence_this_fixes_it\": 0-100,\n  \"if_it_fails_again\": \"the next thing to try\"\n}",
+          "response_schema": "",
+          "appendable_slots": {
+            "reference_images": 1
+          }
+        }
+      },
+      {
+        "id": "nd_254SK54QTQ364Q4JGG57AXT7Q9",
+        "kind": "image-gen",
+        "name": "Repaired frame",
+        "position": {
+          "x": 6240,
+          "y": 0
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_model": "gemini-2.5-pro",
+          "eval_prompt": "Score this image against the attached subject reference. Is it the same subject, part for part, colour for colour, mark for mark? For a human or character reference, judge face geometry, skin tone, eye colour, hair and every visible mark before judging anything else. Is the reserved clean area genuinely clean? Is there any invented text, logo, price or certification anywhere in the frame? Reject on any identity drift, any invented text and any physically impossible lighting.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 8,
+          "eval_max_retries": 2,
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_TR60K7D7E9Q7TASTX6KPN71JFQ",
+        "kind": "image-resize",
+        "name": "Catalogue pack — Catalogue master 2048",
+        "position": {
+          "x": 7020,
+          "y": -60
+        },
+        "config": {
+          "width": 2048,
+          "height": 2048,
+          "resize_mode": "fill"
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_BNJQAG24MST9PRF6KJ7T7KPSF1",
+        "kind": "image-resize",
+        "name": "Catalogue pack — Thumbnail 1024",
+        "position": {
+          "x": 7020,
+          "y": 240
+        },
+        "config": {
+          "width": 1024,
+          "height": 1024,
+          "resize_mode": "fill"
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_GBE1CSGN6B14DZX210G9NPMQBC",
+        "kind": "image-resize",
+        "name": "Catalogue pack — Wide catalogue 2560x1440",
+        "position": {
+          "x": 7020,
+          "y": 540
+        },
+        "config": {
+          "width": 2560,
+          "height": 1440,
+          "resize_mode": "fill"
+        },
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "kind": "download",
+        "name": "Download — every deliverable in this system",
+        "position": {
+          "x": 7800,
+          "y": 0
+        },
+        "config": {
+          "appendable_slots": {
+            "images": 16,
+            "videos": 0
+          }
+        }
+      },
+      {
+        "id": "nd_RSJ2R1FB8SGJWPQJ45MEYJMQYS",
+        "kind": "sticky-note",
+        "name": "note",
+        "position": {
+          "x": 0,
+          "y": -960
+        },
+        "config": {
+          "text": "Omni Campaign Engine · SYSTEM 0095\nD Airport Gate Layover — Life In Use Theatre\n\nTHEME: Airport Gate Layover\nhard terminal light, big windows, luggage and waiting, a transient anonymous palette\n\nDrop ANY subject into the required reference input — product, garment, food, person, character or pet. The graph classifies it and re-routes itself. Nothing in this file names a product."
+        }
+      },
+      {
+        "id": "nd_C7S4YRN2Z3YZ4K18YM45Y3AX4Y",
+        "kind": "sticky-note",
+        "name": "note",
+        "position": {
+          "x": 0,
+          "y": -660
+        },
+        "config": {
+          "text": "STAGE 1 — INGESTION\nOne required subject reference, optional extra references, and an editable operator brief. Fill the brief in; leave lines blank rather than guessing."
+        }
+      },
+      {
+        "id": "nd_V8ZS60SMKM2ZS9K5ZD7D7SVWBW",
+        "kind": "sticky-note",
+        "name": "note",
+        "position": {
+          "x": 780,
+          "y": -660
+        },
+        "config": {
+          "text": "STAGE 2 — FORENSICS\nClassifies the subject P/A/F/C/Z/X and extracts the identity lock: hex set, proportion ratios, finish map, mark placement, unknowns and generation risks. Every node downstream obeys it."
+        }
+      },
+      {
+        "id": "nd_A5FMZ3438XAG98A9V6RKF9Z072",
+        "kind": "sticky-note",
+        "name": "note",
+        "position": {
+          "x": 1560,
+          "y": -660
+        },
+        "config": {
+          "text": "STAGE 3 — STRATEGY\nDecides why this set exists: commercial job, audience, hook, register, copy zones and the studio/indoor/outdoor split used for character subjects."
+        }
+      },
+      {
+        "id": "nd_0678M6RGZ7JBK3AW4RD41VXVWB",
+        "kind": "sticky-note",
+        "name": "note",
+        "position": {
+          "x": 2340,
+          "y": -660
+        },
+        "config": {
+          "text": "STAGE 4 — DIRECTION\nLifestyle Scene Director writes the 12-slot shot plan, one brief per frame, with continuity rules the whole set obeys."
+        }
+      },
+      {
+        "id": "nd_H10FQYERGSTY3PC74SKVAX8H6J",
+        "kind": "sticky-note",
+        "name": "note",
+        "position": {
+          "x": 3120,
+          "y": -2250
+        },
+        "config": {
+          "text": "STAGE 5 — FRAME WRITERS\n12 writers, one per frame. Each owns exactly one slot and carries its own camera, lens, depth of field, composition, grade and reserved clean area."
+        }
+      },
+      {
+        "id": "nd_81CDKGG1SZ365GK1Y74T5EBJ9Y",
+        "kind": "sticky-note",
+        "name": "note",
+        "position": {
+          "x": 3900,
+          "y": -2250
+        },
+        "config": {
+          "text": "STAGE 6 — GENERATION\n12 image-gen nodes at 2 images each, every one conditioned on the subject reference and the identity lock."
+        }
+      },
+      {
+        "id": "nd_62KJQZZ45YN5BGJGP73ENAXH97",
+        "kind": "sticky-note",
+        "name": "note",
+        "position": {
+          "x": 4680,
+          "y": -2250
+        },
+        "config": {
+          "text": "STAGE 7 — QC\nThe critic checks scene plausibility (does this room belong to a real person), moment truth (is this a real second of use), prop honesty, and identity retention under cluttered non-studio light."
+        }
+      },
+      {
+        "id": "nd_0DNSJX5B8N8ESZNFRYT4NNKCDR",
+        "kind": "sticky-note",
+        "name": "note",
+        "position": {
+          "x": 6240,
+          "y": -660
+        },
+        "config": {
+          "text": "STAGE 8 — REPAIR\nOnly the single worst frame is regenerated, never the batch."
+        }
+      },
+      {
+        "id": "nd_10KWPN1CMZWV2MT2P24EEDNQTS",
+        "kind": "sticky-note",
+        "name": "note",
+        "position": {
+          "x": 7020,
+          "y": -780
+        },
+        "config": {
+          "text": "STAGE 9 — DELIVERY\nCatalogue pack, exported at exact pixel sizes."
+        }
+      },
+      {
+        "id": "nd_MWBZF0Z94SX1HMVZ42NN3HXH9W",
+        "kind": "sticky-note",
+        "name": "note",
+        "position": {
+          "x": 7800,
+          "y": -660
+        },
+        "config": {
+          "text": "STAGE 10 — OUTPUT\n16 deliverables collected in the download node.\n\nPACKAGE: A lifestyle set, the scene bible, the subject-lock spec and a QC report."
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "eg_HQQ61YN31VCCV7F94B00YGRDAY",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_XRYSTCPSGVMJ89CRGANKJS90BD",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_R1JJDKZSDPN6KV7DHGKMK2XPQ5",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_XRYSTCPSGVMJ89CRGANKJS90BD",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_9Y54QZ0ZR9XXTB4PV3QG14F094",
+        "source": "nd_DF87FQ2VKPNTPFQWD0MX22WHBB",
+        "sourceHandle": "text",
+        "target": "nd_XRYSTCPSGVMJ89CRGANKJS90BD",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_KHASB70HAZS1KEJAK1FEY4MXD8",
+        "source": "nd_XRYSTCPSGVMJ89CRGANKJS90BD",
+        "sourceHandle": "text",
+        "target": "nd_SQCB94FR2GYNMS28WB49R26P9V",
+        "targetHandle": "parts__0"
+      },
+      {
+        "id": "eg_P1CQEDE0Z3ZEYF51F6A89HH2V8",
+        "source": "nd_DF87FQ2VKPNTPFQWD0MX22WHBB",
+        "sourceHandle": "text",
+        "target": "nd_SQCB94FR2GYNMS28WB49R26P9V",
+        "targetHandle": "parts__1"
+      },
+      {
+        "id": "eg_M2DTZ5KHPY168BQ9BSQKKKET3Q",
+        "source": "nd_SQCB94FR2GYNMS28WB49R26P9V",
+        "sourceHandle": "text",
+        "target": "nd_FVH4Q6XWAQW98Z38F5S38YK91Q",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_NXA1HANEA1SCSCNRK9MZVGM907",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_FVH4Q6XWAQW98Z38F5S38YK91Q",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_PKPFH5S3T6ETM41HXKWXCD8SES",
+        "source": "nd_FVH4Q6XWAQW98Z38F5S38YK91Q",
+        "sourceHandle": "text",
+        "target": "nd_DQ94SAM32ENXVVZPPWSDCB0TDV",
+        "targetHandle": "parts__0"
+      },
+      {
+        "id": "eg_KEXQ73RDB62FE88CHX8S73CBT4",
+        "source": "nd_XRYSTCPSGVMJ89CRGANKJS90BD",
+        "sourceHandle": "text",
+        "target": "nd_DQ94SAM32ENXVVZPPWSDCB0TDV",
+        "targetHandle": "parts__1"
+      },
+      {
+        "id": "eg_PR7N214TCF32DGGJSJFMX6TJMC",
+        "source": "nd_DQ94SAM32ENXVVZPPWSDCB0TDV",
+        "sourceHandle": "text",
+        "target": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_5CS1VZ5JTRPR08RXDZTG7AMB49",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_X3GPXS80KG3RSMG4BARZKS2S27",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_P7CQF72WHZK8W8042FMA6PWQPW",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_E69SKWBE6TJQEW23PJMN66QPMD",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_P7CQF72WHZK8W8042FMA6PWQPW",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_SBYWRDZCXB8CWFY99C8CFEH0NF",
+        "source": "nd_P7CQF72WHZK8W8042FMA6PWQPW",
+        "sourceHandle": "text",
+        "target": "nd_ATWWYDG1N3C3XSWX5XH0RE6W5N",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_G94QJ0BS2A8SYS770EPS3FY2W6",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_ATWWYDG1N3C3XSWX5XH0RE6W5N",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_MB21EWSDYA20KAE674P500BK44",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_ATWWYDG1N3C3XSWX5XH0RE6W5N",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_3DFY0WAV9S312JG7XB1YRQR331",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_ATWWYDG1N3C3XSWX5XH0RE6W5N",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_G0YYK2Y756E4AERENWSPKJ07SA",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_X77H0T4GQ7DF5P1RN3HK73M8HG",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_1Q4BBBG5JJZBH3TP0QTC6GHEEB",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_X77H0T4GQ7DF5P1RN3HK73M8HG",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_G2B59SJ02APVEK3ZXE7CRGB412",
+        "source": "nd_X77H0T4GQ7DF5P1RN3HK73M8HG",
+        "sourceHandle": "text",
+        "target": "nd_KZ7EVQB71XM19PNYJKPZP2VCJW",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_EF9797BB26ZEG4NQ5574MANWGT",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_KZ7EVQB71XM19PNYJKPZP2VCJW",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_R2WM34S5YGV0KC9HD3JHSTACMR",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_KZ7EVQB71XM19PNYJKPZP2VCJW",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_EM4GF19JZYAM5B5TYG5P4EP9Y0",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_KZ7EVQB71XM19PNYJKPZP2VCJW",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_WGRAKRGSQ7X2Z1XZ2SA1CB3K6B",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_FM57FW04FZE70YEW364A6RMDBZ",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_PZKX1FV01DMMHERYAGXEWY4ZNW",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_FM57FW04FZE70YEW364A6RMDBZ",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_HXWS2HN4ZTRW4C1C98FTHD538Q",
+        "source": "nd_FM57FW04FZE70YEW364A6RMDBZ",
+        "sourceHandle": "text",
+        "target": "nd_JVVHHXJTJ59NQHYME701ZPPX3Q",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_82E8YVN0D2J4FMATAGP38SD0HX",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_JVVHHXJTJ59NQHYME701ZPPX3Q",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_KEBGCYXAXJRWM9TPB7XZSY7EQ4",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_JVVHHXJTJ59NQHYME701ZPPX3Q",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_VN9A3HN95FEZ2XN24KEBRHYJGK",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_JVVHHXJTJ59NQHYME701ZPPX3Q",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_1W5D8W8Z20ZE5M6HDM4HEX14W2",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_8MMABPC1XSQKW6XHNZS6MPRD8J",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_1BKWHR0K3SRCR1YMBEBMZ6YAE2",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_8MMABPC1XSQKW6XHNZS6MPRD8J",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_M1C8NSHPVVG8QRWFSBTHRXSHT5",
+        "source": "nd_8MMABPC1XSQKW6XHNZS6MPRD8J",
+        "sourceHandle": "text",
+        "target": "nd_XJ7SDS57SHADQSKWFPDEK4BQN3",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_NSNB1RM2JPQTPBNX3XKCDJT57E",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_XJ7SDS57SHADQSKWFPDEK4BQN3",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_X1S7YKABFXNJT6F483FQZE6J4T",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_XJ7SDS57SHADQSKWFPDEK4BQN3",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_KTM9QZ8JFYXZH5YD3QPG5BH347",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_XJ7SDS57SHADQSKWFPDEK4BQN3",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_CRJWT1455HWDF779CY7S5ME4DE",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_G3R4PDMNA037WTF3R3H02XN5NW",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_WBDK32ZJPWR9RAEG2FGSANFYSV",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_G3R4PDMNA037WTF3R3H02XN5NW",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_9XGB1WV36VKWNPA3XWFD7PV3NT",
+        "source": "nd_G3R4PDMNA037WTF3R3H02XN5NW",
+        "sourceHandle": "text",
+        "target": "nd_ZF56KX70V6XAJD4NERTM60HRAV",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_5YT8AENSGVARQQW35RRECMEJBV",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_ZF56KX70V6XAJD4NERTM60HRAV",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_7HSWZHMCHJMGQEZNKDHQZZXDVR",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_ZF56KX70V6XAJD4NERTM60HRAV",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_YTKB1YX6NWY1Q08N44KMVQQYBM",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_ZF56KX70V6XAJD4NERTM60HRAV",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_540CB9YP217NT6GB0NYR4C6DHD",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_AKQSAZCWPAEE1N7424K81XXK6E",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_TEE2WBJPD8MJT7B39M9HBF4G91",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_AKQSAZCWPAEE1N7424K81XXK6E",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_6RJNN9C4PJP77S2T56P1AQ61TF",
+        "source": "nd_AKQSAZCWPAEE1N7424K81XXK6E",
+        "sourceHandle": "text",
+        "target": "nd_67Q0B7VJCP05TC3TKTEBERHJSE",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_ZVMSG2BATDME3FK3023F1EFG37",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_67Q0B7VJCP05TC3TKTEBERHJSE",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_BWAB18QHD954XG2N9QC5Z937AT",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_67Q0B7VJCP05TC3TKTEBERHJSE",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_A2D6WDFEVGV9ZHATWWPQVN40W2",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_67Q0B7VJCP05TC3TKTEBERHJSE",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_PZE951TXQEXAMQQNF5K6R4BYK2",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_JME27K6BRMSC1NN441RRY37DET",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_5XMMQZ4Z8VXFWG43WWPF4JWMJG",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_JME27K6BRMSC1NN441RRY37DET",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_AGZNGW38RTEHVQBAMZ6JMY9YV0",
+        "source": "nd_JME27K6BRMSC1NN441RRY37DET",
+        "sourceHandle": "text",
+        "target": "nd_HG9CKV7JPSTP7PHAH5BW30RF9W",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_9JM3C4NJ60DFCST1CD7FTHW1JE",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_HG9CKV7JPSTP7PHAH5BW30RF9W",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_V7A87NW5D8H0NBVNJPW0YM7A3E",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_HG9CKV7JPSTP7PHAH5BW30RF9W",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_FG1JVN9M4J3AE8NTQECVVF0BJM",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_HG9CKV7JPSTP7PHAH5BW30RF9W",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_4MTTN1BWZBZMJCM1TYM71H4716",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_3PK8PBYNHBB8JCR2J5Y6MBFYXG",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_ABMEJRNYT8FKA1JM2NN9RXF8K9",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_3PK8PBYNHBB8JCR2J5Y6MBFYXG",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_H7PBRDAFDTYVCD52R38Z9ESMEK",
+        "source": "nd_3PK8PBYNHBB8JCR2J5Y6MBFYXG",
+        "sourceHandle": "text",
+        "target": "nd_GJKDHBK7WSYG7JDQ354GK47Q94",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_YW6ZP2REJE5S37Q02H9KW16TK1",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_GJKDHBK7WSYG7JDQ354GK47Q94",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_44ZBWFH24YHXGWVSF5W9G3VQKQ",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_GJKDHBK7WSYG7JDQ354GK47Q94",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_E93VA74BZH20NZ09BS3SVW3675",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_GJKDHBK7WSYG7JDQ354GK47Q94",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_2NN04F21WVTJZ42YTZGCRHWGG5",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_BXFQ1T0Y19HQC18Z7VSV8GS1Z6",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_6PHFMPMFX739Q9A92ZG30XKPMB",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_BXFQ1T0Y19HQC18Z7VSV8GS1Z6",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_X9C5KXTZB9M1DH4Y14T8E68R2T",
+        "source": "nd_BXFQ1T0Y19HQC18Z7VSV8GS1Z6",
+        "sourceHandle": "text",
+        "target": "nd_DMKE0GSXBKZ1N53S4K1N8GFT6V",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_TA7JSA3HC5AVE6BBB32NM2EJCE",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_DMKE0GSXBKZ1N53S4K1N8GFT6V",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_CTDRYE1E7XVXBFJEAJ34MFPFDX",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_DMKE0GSXBKZ1N53S4K1N8GFT6V",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_347A43FN2K0JTR814WDMS3HDH2",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_DMKE0GSXBKZ1N53S4K1N8GFT6V",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_YVBH48N3TJTHXA83X15PW8STJN",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_CF1P2K1KRTWYBP9XFE32M992R7",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_0G8M8EHKW1PSAJ8ZMA0P2Y452G",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_CF1P2K1KRTWYBP9XFE32M992R7",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_M45V79YEFTDJS3THHDVP4EQPP8",
+        "source": "nd_CF1P2K1KRTWYBP9XFE32M992R7",
+        "sourceHandle": "text",
+        "target": "nd_KZEFJH4P0RTF0G87WWX3D3RA40",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_C9GQY714X0JFFEYG4W3J9N2PVP",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_KZEFJH4P0RTF0G87WWX3D3RA40",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_TQJYYKSJ81M629TM7R5TR3EE6G",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_KZEFJH4P0RTF0G87WWX3D3RA40",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_G4VMGHHZB9922BASEQW7B75YK4",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_KZEFJH4P0RTF0G87WWX3D3RA40",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_NQ3GT299FK059M5G6ZNT9J6H3K",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_FMZD0PG9QTPP0DB1JRV3N8K2GX",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_GJ438C5HD6PEXER6GA441CDRFC",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_FMZD0PG9QTPP0DB1JRV3N8K2GX",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_AZCAHZ5HVYWAZNAZ8FYM9FYB9T",
+        "source": "nd_FMZD0PG9QTPP0DB1JRV3N8K2GX",
+        "sourceHandle": "text",
+        "target": "nd_NEMEAB6AG7CZVD4XK2Y2RSKEAZ",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_96KZH7GY1ZCC9TK6HXZX5PGJJ4",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_NEMEAB6AG7CZVD4XK2Y2RSKEAZ",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_2T55C08SKAZWEKBB9TNYHAG500",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_NEMEAB6AG7CZVD4XK2Y2RSKEAZ",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_A0W9G2SWVZJT6HB4V93F0DJDC4",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_NEMEAB6AG7CZVD4XK2Y2RSKEAZ",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_D4YT2676G58MQTCMDAAY1Q0FZW",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_4FT85XXTKZSE4TYD19TGFBZE03",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_Y1PA98FTK90G80Q1XKCCA9ZNFD",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_4FT85XXTKZSE4TYD19TGFBZE03",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_3H5RE9CYQS16QM8DAGEZTM7DCE",
+        "source": "nd_4FT85XXTKZSE4TYD19TGFBZE03",
+        "sourceHandle": "text",
+        "target": "nd_19ZP6QBKAJXFBPAJM69WKCDJCQ",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_7NH9KJSV3430W34QA3W794MZPQ",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_19ZP6QBKAJXFBPAJM69WKCDJCQ",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_3PMQAPHKRWR7T06NK080EJ0KZG",
+        "source": "nd_BB74KQ4NJJ7CP5K46AYHY508RQ",
+        "sourceHandle": "images",
+        "target": "nd_19ZP6QBKAJXFBPAJM69WKCDJCQ",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_X1KS5WE75JWW0XEFTS2HCNE4RK",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_19ZP6QBKAJXFBPAJM69WKCDJCQ",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_EWNJ2HGQ99W7F3TECBTM52EW0K",
+        "source": "nd_XRYSTCPSGVMJ89CRGANKJS90BD",
+        "sourceHandle": "text",
+        "target": "nd_BST7FGHF7PMSRSY8G8DZW2RMZC",
+        "targetHandle": "parts__0"
+      },
+      {
+        "id": "eg_QTFY2NAQNJK8W1DHRF8ZT6EVTW",
+        "source": "nd_J1DF53HGAA9SF9D1VEZCNXMGZZ",
+        "sourceHandle": "text",
+        "target": "nd_BST7FGHF7PMSRSY8G8DZW2RMZC",
+        "targetHandle": "parts__1"
+      },
+      {
+        "id": "eg_K8FPF4N6P06KA02846PT9W490H",
+        "source": "nd_BST7FGHF7PMSRSY8G8DZW2RMZC",
+        "sourceHandle": "text",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_K6ASRAZDX88CE8DR7G40908MGT",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_1W7J3SZG27CVYDJFNDTAG8DP3W",
+        "source": "nd_ATWWYDG1N3C3XSWX5XH0RE6W5N",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_QY8ZYD136SB3PGC154HTT9YVZC",
+        "source": "nd_KZ7EVQB71XM19PNYJKPZP2VCJW",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_CX4A6F1BQD51AG270TNTRPRP5X",
+        "source": "nd_JVVHHXJTJ59NQHYME701ZPPX3Q",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__3"
+      },
+      {
+        "id": "eg_3XY5P03KY8Z3GBD1ZD33F0CN2C",
+        "source": "nd_XJ7SDS57SHADQSKWFPDEK4BQN3",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__4"
+      },
+      {
+        "id": "eg_QW1FW4BGNXT5E2G0RR1NQRG328",
+        "source": "nd_ZF56KX70V6XAJD4NERTM60HRAV",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__5"
+      },
+      {
+        "id": "eg_8S4T7XTRXYHZKE7M4AB156QX10",
+        "source": "nd_67Q0B7VJCP05TC3TKTEBERHJSE",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__6"
+      },
+      {
+        "id": "eg_QP7X0XY0NR3DCJ86P1XMR9TG8F",
+        "source": "nd_HG9CKV7JPSTP7PHAH5BW30RF9W",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__7"
+      },
+      {
+        "id": "eg_T196P7XSXXXJ3CHZEQP6DHSSSD",
+        "source": "nd_GJKDHBK7WSYG7JDQ354GK47Q94",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__8"
+      },
+      {
+        "id": "eg_Q72D7EVZ234G7JN83Q5CTV9F2E",
+        "source": "nd_DMKE0GSXBKZ1N53S4K1N8GFT6V",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__9"
+      },
+      {
+        "id": "eg_X6VR7CV70FKK6X09EB2REZWF3Z",
+        "source": "nd_KZEFJH4P0RTF0G87WWX3D3RA40",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__10"
+      },
+      {
+        "id": "eg_ZN1VWD80FA0BYTKP5YG9G4VGTP",
+        "source": "nd_NEMEAB6AG7CZVD4XK2Y2RSKEAZ",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__11"
+      },
+      {
+        "id": "eg_1ZVJ31D0GEVCJGYPDFJXBFP3CT",
+        "source": "nd_19ZP6QBKAJXFBPAJM69WKCDJCQ",
+        "sourceHandle": "image",
+        "target": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "targetHandle": "reference_images__12"
+      },
+      {
+        "id": "eg_HB6BZGQNGNV0Q7NY10K1HKN8X3",
+        "source": "nd_BGBVW3RDRFYAKV5Y236SHN6VA2",
+        "sourceHandle": "text",
+        "target": "nd_BA1NNC4GWN1WDM4C7E2H1F55XY",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_RR20TA9DXSSBB7ZPCNBV86004S",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_BA1NNC4GWN1WDM4C7E2H1F55XY",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_EK07KTQW2YNFY31QB1BEFTA31H",
+        "source": "nd_BA1NNC4GWN1WDM4C7E2H1F55XY",
+        "sourceHandle": "text",
+        "target": "nd_254SK54QTQ364Q4JGG57AXT7Q9",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_4233RY8Z998RBBGGDKCS0764NF",
+        "source": "nd_85CRN6P69GDE7HJQ13ZQJ19168",
+        "sourceHandle": "image",
+        "target": "nd_254SK54QTQ364Q4JGG57AXT7Q9",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_4DFZCASVB0C9CY2E4WQKT89AMP",
+        "source": "nd_ATWWYDG1N3C3XSWX5XH0RE6W5N",
+        "sourceHandle": "image",
+        "target": "nd_254SK54QTQ364Q4JGG57AXT7Q9",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_XQQSJ988T348MZSFAB22VKT7AG",
+        "source": "nd_5CH9YJ3X41YM2Z3VQXY8VJC2DY",
+        "sourceHandle": "value",
+        "target": "nd_254SK54QTQ364Q4JGG57AXT7Q9",
+        "targetHandle": "aspect_ratio"
+      },
+      {
+        "id": "eg_S0S4XHY870MN7ZMFPYAP59BVCQ",
+        "source": "nd_ATWWYDG1N3C3XSWX5XH0RE6W5N",
+        "sourceHandle": "image",
+        "target": "nd_TR60K7D7E9Q7TASTX6KPN71JFQ",
+        "targetHandle": "image"
+      },
+      {
+        "id": "eg_WJ2M3Y3TFWSYP49XJ3PV6F0SAD",
+        "source": "nd_ATWWYDG1N3C3XSWX5XH0RE6W5N",
+        "sourceHandle": "image",
+        "target": "nd_BNJQAG24MST9PRF6KJ7T7KPSF1",
+        "targetHandle": "image"
+      },
+      {
+        "id": "eg_8DFGR40JJRV1CXA9638S0D1W40",
+        "source": "nd_ATWWYDG1N3C3XSWX5XH0RE6W5N",
+        "sourceHandle": "image",
+        "target": "nd_GBE1CSGN6B14DZX210G9NPMQBC",
+        "targetHandle": "image"
+      },
+      {
+        "id": "eg_JSBWVCD6D06FC4HM0BST2KRHAW",
+        "source": "nd_ATWWYDG1N3C3XSWX5XH0RE6W5N",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__0"
+      },
+      {
+        "id": "eg_0Z24A9RDS20J2GCD9QGDGMX7DK",
+        "source": "nd_KZ7EVQB71XM19PNYJKPZP2VCJW",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__1"
+      },
+      {
+        "id": "eg_B5BFFF98J2QZM68SQ31T5TGX4S",
+        "source": "nd_JVVHHXJTJ59NQHYME701ZPPX3Q",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__2"
+      },
+      {
+        "id": "eg_3QCD3J3T75C7MDJHPGENRA4SJC",
+        "source": "nd_XJ7SDS57SHADQSKWFPDEK4BQN3",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__3"
+      },
+      {
+        "id": "eg_MHTD8VQJY1TEP39JT1J9Z0EHJT",
+        "source": "nd_ZF56KX70V6XAJD4NERTM60HRAV",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__4"
+      },
+      {
+        "id": "eg_SRK281MVX64YF3JRFEDDDR3QP5",
+        "source": "nd_67Q0B7VJCP05TC3TKTEBERHJSE",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__5"
+      },
+      {
+        "id": "eg_1GBQK6G3WQGMYFW27KR0H198H4",
+        "source": "nd_HG9CKV7JPSTP7PHAH5BW30RF9W",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__6"
+      },
+      {
+        "id": "eg_G6STQEB36CSTRDT6ZEEW5FZDQH",
+        "source": "nd_GJKDHBK7WSYG7JDQ354GK47Q94",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__7"
+      },
+      {
+        "id": "eg_3W5DKRAK56XMHNXH0BKKMKKJKS",
+        "source": "nd_DMKE0GSXBKZ1N53S4K1N8GFT6V",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__8"
+      },
+      {
+        "id": "eg_28JX7EP285173AZ8MABEYHSM0B",
+        "source": "nd_KZEFJH4P0RTF0G87WWX3D3RA40",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__9"
+      },
+      {
+        "id": "eg_MNXNEGG97NPC3F0PC0WATX7W6M",
+        "source": "nd_NEMEAB6AG7CZVD4XK2Y2RSKEAZ",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__10"
+      },
+      {
+        "id": "eg_PV38X9932ZMYK21X22Z3BF27Z5",
+        "source": "nd_19ZP6QBKAJXFBPAJM69WKCDJCQ",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__11"
+      },
+      {
+        "id": "eg_YN8JM32DK9XWYHRC92Y2PK4F7G",
+        "source": "nd_254SK54QTQ364Q4JGG57AXT7Q9",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__12"
+      },
+      {
+        "id": "eg_H5FSX30GH4MVGMQDH9CSJ9KP9N",
+        "source": "nd_TR60K7D7E9Q7TASTX6KPN71JFQ",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__13"
+      },
+      {
+        "id": "eg_XANN4Z6KVYCFG55MHM750D294E",
+        "source": "nd_BNJQAG24MST9PRF6KJ7T7KPSF1",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__14"
+      },
+      {
+        "id": "eg_ZM547BRWASXB612W1CK1QAANBD",
+        "source": "nd_GBE1CSGN6B14DZX210G9NPMQBC",
+        "sourceHandle": "image",
+        "target": "nd_AWQJQC4WDKGP5Q1NDDAN14C4BD",
+        "targetHandle": "images__15"
+      }
+    ]
+  }
+}

@@ -1,0 +1,985 @@
+{
+  "format": "vibe-workflow-export",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-16T20:43:44.000Z",
+  "doc": {
+    "name": "V0709. Autonomous Video QA & Repair Loop #29",
+    "nodes": [
+      {
+        "id": "nd_Y05RQYMTB8HR0DJEEVBQD82BNS",
+        "kind": "sticky-note",
+        "position": {
+          "x": 0,
+          "y": -680
+        },
+        "config": {
+          "text": "PIPELINE (from the library spec)\nIngestion of rendered video \u2192 Frame Extraction samples N frames per shot \u2192 Quality Critic scores product-fidelity, motion-plausibility, continuity, artifact-freedom per shot \u2192 Failure Vector Classifier tags exact defect (warped geometry / lipsync drift / lighting mismatch / morphing artifact) \u2192 Targeted Repair regenerates ONLY the failing shot segment via Nano Banana Pro keyframe fix + Omni Flash 1.1 re-animation \u2192 Re-splice into master timeline \u2192 Re-score \u2192 escalate to human review after 2 failed repairs."
+        }
+      },
+      {
+        "id": "nd_CYT0K9QQ7SP2FAV05EE5K81V5P",
+        "kind": "sticky-note",
+        "position": {
+          "x": 0,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 1 \u2014 INGESTION + FRAME SAMPLING\nThe rendered video goes in; frames are sampled across the timeline so the critic can see, not guess."
+        }
+      },
+      {
+        "id": "nd_HC7V4BFSS9YK5XBB7QEERWWN8Q",
+        "kind": "video-input",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "url": ""
+        },
+        "name": "Rendered video under review"
+      },
+      {
+        "id": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "kind": "reference-image-input",
+        "position": {
+          "x": 0,
+          "y": 340
+        },
+        "config": {
+          "url": ""
+        },
+        "name": "Source reference \u2014 ground truth"
+      },
+      {
+        "id": "nd_SES853BEW0M56GZ9HKWM0G22D6",
+        "kind": "video-analyzer",
+        "position": {
+          "x": 760,
+          "y": 0
+        },
+        "config": {},
+        "name": "Video analyzer \u2014 motion and continuity read"
+      },
+      {
+        "id": "nd_D54PA8H7M46PHQ8JAF2K9345QA",
+        "kind": "video-frame-extract",
+        "position": {
+          "x": 760,
+          "y": 340
+        },
+        "config": {
+          "fps": 25,
+          "frame": 0
+        },
+        "name": "Frame sample @ 0"
+      },
+      {
+        "id": "nd_Z0V5NXVWXMZ8Y0Y2M12HT25VW5",
+        "kind": "video-frame-extract",
+        "position": {
+          "x": 760,
+          "y": 680
+        },
+        "config": {
+          "fps": 25,
+          "frame": 48
+        },
+        "name": "Frame sample @ 48"
+      },
+      {
+        "id": "nd_FP80TSY8XBEAC2DRKW2ZQ8TVT1",
+        "kind": "video-frame-extract",
+        "position": {
+          "x": 760,
+          "y": 1020
+        },
+        "config": {
+          "fps": 25,
+          "frame": 120
+        },
+        "name": "Frame sample @ 120"
+      },
+      {
+        "id": "nd_GD0P7926FY2MBVEX4XA57E9QE6",
+        "kind": "video-frame-extract",
+        "position": {
+          "x": 760,
+          "y": 1360
+        },
+        "config": {
+          "fps": 25,
+          "frame": 200
+        },
+        "name": "Frame sample @ 200"
+      },
+      {
+        "id": "nd_D2278X6PHTDBWK2GE3ZGB8TEPM",
+        "kind": "video-frame-extract",
+        "position": {
+          "x": 760,
+          "y": 1700
+        },
+        "config": {
+          "fps": 25,
+          "frame": 280
+        },
+        "name": "Frame sample @ 280"
+      },
+      {
+        "id": "nd_9XP849VW7D0G91HJCXCTMZ39Q6",
+        "kind": "sticky-note",
+        "position": {
+          "x": 1520,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 2 \u2014 QUALITY CRITIC\nScores product-fidelity, motion-plausibility, continuity and artifact-freedom per shot."
+        }
+      },
+      {
+        "id": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "kind": "text-gen",
+        "position": {
+          "x": 1520,
+          "y": 0
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 8000,
+          "temperature": 0.2,
+          "system_prompt": "ROLE\nYou are the critic and QC gate for this system. The 5 generated assets are wired into your reference slots together with the source reference. The pipeline's own QC\nspecification is quoted below and you implement it literally \u2014 you are not here to\nbe encouraging, you are here to catch what ships badly.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: video library, section L (Autonomous Production / QA \u2014 Video Repair Loops)\nSystem: V0709 \u2014 Autonomous Video QA & Repair Loop #29\nSubject: Autonomous Video QA & Repair Loop\nTreatment: Autonomous Video QA & Repair Loop #29\nDeclared models for this system: Video Analyzer + Nano Banana Pro (repair keyframes) + Omni Flash 1.1 (repair motion)\nDeclared input: Any generated video batch (single or multi-shot).\n\nThe full pipeline you are one node inside:\nIngestion of rendered video \u2192 Frame Extraction samples N frames per shot \u2192 Quality Critic scores product-fidelity, motion-plausibility, continuity, artifact-freedom per shot \u2192 Failure Vector Classifier tags exact defect (warped geometry / lipsync drift / lighting mismatch / morphing artifact) \u2192 Targeted Repair regenerates ONLY the failing shot segment via Nano Banana Pro keyframe fix + Omni Flash 1.1 re-animation \u2192 Re-splice into master timeline \u2192 Re-score \u2192 escalate to human review after 2 failed repairs.\n\nThe QC stage that will judge your output:\nThis workflow IS the QA loop \u2014 self-contained; produces a pass/fail ledger and repaired master file, escalating unresolved shots to human review.\n\nThe package this pipeline finally owes the client:\nRepaired master video, shot-by-shot QC ledger, escalation queue if unresolved.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"You are an autonomous video QA critic. Sample frames from each shot and score product fidelity, motion plausibility, and continuity against the master spec. Classify any failure by precise defect type so repair can be surgical \u2014 never regenerate a passing shot.\"\"\n\nSCORING AXES \u2014 score each 0-100, independently, per asset\n- subject_fidelity: identity and geometry hold across every frame\n- motion_plausibility: physics, weight, no morphing or sliding\n- continuity: boundary frames match at every join point\n- camera_fidelity: the executed move matches the specified move\n- grade_consistency: identical grade across all clips\n- artifact_freedom: flicker, warping, duplicated limbs, text hallucination\n\nMETHOD\n1. Score every asset on every axis. Justify each score with a specific observation:\n   \"key light is camera-left in five assets and camera-right in asset 3\", never\n   \"looks a bit off\".\n2. Diff every asset against the forensics spec on the identity-critical regions:\n   logo, geometry, proportions, colourway, label copy.\n3. Any axis below 90 fails that asset. Record the exact failure vector so the\n   repair node can route the fix: relight / logo-reprint / geometry-lock regen /\n   recompose / re-animate / re-grade.\n4. Flag set-level problems separately from per-asset problems \u2014 a set where every\n   asset passes individually can still fail as a set.\n5. Rank the passing assets for delivery order.\n\nHARD CONSTRAINTS\n- Never pass an asset whose label copy differs from the source.\n- Never pass a comparison, before/after or claim-adjacent asset whose lighting or\n  angle parity would make the comparison misleading.\n- Two failed repair attempts on the same asset escalates to human review. Say so.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"per_asset\": [{\"asset\":1,\"scores\":{},\"observations\":[],\"verdict\":\"pass|fail\",\"failure_vector\":\"\",\"repair_route\":\"\"}],\n    \"set_level_findings\": [{\"attribute\":\"\",\"finding\":\"\",\"assets_affected\":[]}],\n    \"repair_queue\": [{\"asset\":1,\"instruction\":\"\"}],\n    \"escalate_to_human\": [],\n    \"delivery_order\": []\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 6
+          }
+        },
+        "name": "Quality critic \u2014 per-shot scoring"
+      },
+      {
+        "id": "nd_GBN5RNEK45DGEZ7XAYBXSTSTGH",
+        "kind": "sticky-note",
+        "position": {
+          "x": 2280,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 3 \u2014 FAILURE VECTOR CLASSIFIER + ROUTED REPAIR\nWarped geometry, lipsync drift, lighting mismatch and morphing artifacts each route to their own fix: a corrected keyframe plus a re-animation."
+        }
+      },
+      {
+        "id": "nd_YY4AX2D7KW4WDD172S1FC2BYAN",
+        "kind": "text-gen",
+        "position": {
+          "x": 2280,
+          "y": 0
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4000,
+          "temperature": 0.3,
+          "system_prompt": "ROLE\nYou are the targeted repair director. The critic's report arrives on your prompt\ninput. You rewrite ONLY the failing asset's generation prompt. You never re-brief the\nwhole batch \u2014 isolated repair is the entire point of this stage.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: video library, section L (Autonomous Production / QA \u2014 Video Repair Loops)\nSystem: V0709 \u2014 Autonomous Video QA & Repair Loop #29\nSubject: Autonomous Video QA & Repair Loop\nTreatment: Autonomous Video QA & Repair Loop #29\nDeclared models for this system: Video Analyzer + Nano Banana Pro (repair keyframes) + Omni Flash 1.1 (repair motion)\nDeclared input: Any generated video batch (single or multi-shot).\n\nThe full pipeline you are one node inside:\nIngestion of rendered video \u2192 Frame Extraction samples N frames per shot \u2192 Quality Critic scores product-fidelity, motion-plausibility, continuity, artifact-freedom per shot \u2192 Failure Vector Classifier tags exact defect (warped geometry / lipsync drift / lighting mismatch / morphing artifact) \u2192 Targeted Repair regenerates ONLY the failing shot segment via Nano Banana Pro keyframe fix + Omni Flash 1.1 re-animation \u2192 Re-splice into master timeline \u2192 Re-score \u2192 escalate to human review after 2 failed repairs.\n\nThe QC stage that will judge your output:\nThis workflow IS the QA loop \u2014 self-contained; produces a pass/fail ledger and repaired master file, escalating unresolved shots to human review.\n\nThe package this pipeline finally owes the client:\nRepaired master video, shot-by-shot QC ledger, escalation queue if unresolved.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"You are an autonomous video QA critic. Sample frames from each shot and score product fidelity, motion plausibility, and continuity against the master spec. Classify any failure by precise defect type so repair can be surgical \u2014 never regenerate a passing shot.\"\"\n\nMETHOD\n1. Read the repair queue. Take the highest-priority failing asset.\n2. Identify the failure vector exactly: colour drift, logo distortion, geometry warp,\n   lighting mismatch, scale error, artifact, continuity break, motion implausibility.\n3. Rewrite that asset's prompt so the failure is addressed by construction, not by\n   pleading \u2014 if the logo warped, change the angle and lens that made it warp and\n   state the logo's exact position and scale; if the colour drifted, restate the\n   exact colourway and remove the ambient bounce that shifted it.\n4. Change nothing else. Every passing attribute of that asset must survive the repair.\n5. Write the stricter negative prompt for the retry.\n\nHARD CONSTRAINTS\n- One asset per repair pass. Never merge two failures into one rewrite.\n- Never \"improve\" anything the critic did not flag.\n- If this is the second failed attempt on the same asset, say so and recommend\n  human review instead of a third automated retry.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"asset_being_repaired\": 0,\n    \"failure_vector\": \"\",\n    \"root_cause\": \"why the original prompt produced it\",\n    \"repaired_clip_prompt\": \"\",\n    \"negative_prompt\": \"\",\n    \"unchanged_attributes\": [\"everything preserved from the passing version\"],\n    \"attempt_number\": 1\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 6
+          }
+        },
+        "name": "Route 1 \u2014 Geometry warp"
+      },
+      {
+        "id": "nd_804PSYB6MP0NYV94PS5VCSY494",
+        "kind": "image-gen",
+        "position": {
+          "x": 3040,
+          "y": 0
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score 0-100 on colour match, logo fidelity, geometry and silhouette consistency against the reference. Required frame: Geometry warp. QC rule for this system: This workflow IS the QA loop \u2014 self-contained; produces a pass/fail ledger and repaired master file, escalating unresolved shots to human review. Reject and retry if the logo is redrawn, any text is invented or garbled, geometry is warped, or the grade drifts.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 6
+          }
+        },
+        "name": "Keyframe fix 1 \u2014 Geometry warp",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_4FQYQ1FKVYCSGYHHD4MRYABNC9",
+        "kind": "video-reference",
+        "position": {
+          "x": 3800,
+          "y": 0
+        },
+        "config": {
+          "model": "gemini-omni-1.1-flash",
+          "cfg_scale": 0.5,
+          "watermark": false,
+          "resolution": "1080p",
+          "aspect_ratio": "16:9",
+          "generate_audio": true,
+          "negative_prompt": "blur, distort, low quality, warped product geometry, melting logo, garbled text, extra fingers, plastic skin, flicker, jitter, duplicated limbs, watermark, oversaturated HDR halo",
+          "duration_seconds": 6,
+          "enable_safety_checker": true,
+          "prompt_expansion_mode": "balanced",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Re-animate 1 \u2014 Geometry warp",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_7AS1GR6XYWF2XXJ0VEYX5ZKCTF",
+        "kind": "text-gen",
+        "position": {
+          "x": 2280,
+          "y": 340
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4000,
+          "temperature": 0.3,
+          "system_prompt": "ROLE\nYou are the targeted repair director. The critic's report arrives on your prompt\ninput. You rewrite ONLY the failing asset's generation prompt. You never re-brief the\nwhole batch \u2014 isolated repair is the entire point of this stage.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: video library, section L (Autonomous Production / QA \u2014 Video Repair Loops)\nSystem: V0709 \u2014 Autonomous Video QA & Repair Loop #29\nSubject: Autonomous Video QA & Repair Loop\nTreatment: Autonomous Video QA & Repair Loop #29\nDeclared models for this system: Video Analyzer + Nano Banana Pro (repair keyframes) + Omni Flash 1.1 (repair motion)\nDeclared input: Any generated video batch (single or multi-shot).\n\nThe full pipeline you are one node inside:\nIngestion of rendered video \u2192 Frame Extraction samples N frames per shot \u2192 Quality Critic scores product-fidelity, motion-plausibility, continuity, artifact-freedom per shot \u2192 Failure Vector Classifier tags exact defect (warped geometry / lipsync drift / lighting mismatch / morphing artifact) \u2192 Targeted Repair regenerates ONLY the failing shot segment via Nano Banana Pro keyframe fix + Omni Flash 1.1 re-animation \u2192 Re-splice into master timeline \u2192 Re-score \u2192 escalate to human review after 2 failed repairs.\n\nThe QC stage that will judge your output:\nThis workflow IS the QA loop \u2014 self-contained; produces a pass/fail ledger and repaired master file, escalating unresolved shots to human review.\n\nThe package this pipeline finally owes the client:\nRepaired master video, shot-by-shot QC ledger, escalation queue if unresolved.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"You are an autonomous video QA critic. Sample frames from each shot and score product fidelity, motion plausibility, and continuity against the master spec. Classify any failure by precise defect type so repair can be surgical \u2014 never regenerate a passing shot.\"\"\n\nMETHOD\n1. Read the repair queue. Take the highest-priority failing asset.\n2. Identify the failure vector exactly: colour drift, logo distortion, geometry warp,\n   lighting mismatch, scale error, artifact, continuity break, motion implausibility.\n3. Rewrite that asset's prompt so the failure is addressed by construction, not by\n   pleading \u2014 if the logo warped, change the angle and lens that made it warp and\n   state the logo's exact position and scale; if the colour drifted, restate the\n   exact colourway and remove the ambient bounce that shifted it.\n4. Change nothing else. Every passing attribute of that asset must survive the repair.\n5. Write the stricter negative prompt for the retry.\n\nHARD CONSTRAINTS\n- One asset per repair pass. Never merge two failures into one rewrite.\n- Never \"improve\" anything the critic did not flag.\n- If this is the second failed attempt on the same asset, say so and recommend\n  human review instead of a third automated retry.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"asset_being_repaired\": 0,\n    \"failure_vector\": \"\",\n    \"root_cause\": \"why the original prompt produced it\",\n    \"repaired_clip_prompt\": \"\",\n    \"negative_prompt\": \"\",\n    \"unchanged_attributes\": [\"everything preserved from the passing version\"],\n    \"attempt_number\": 1\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 6
+          }
+        },
+        "name": "Route 2 \u2014 Lighting mismatch"
+      },
+      {
+        "id": "nd_4C7PAZ9MTD6RDWEJJ8WHCABVE5",
+        "kind": "image-gen",
+        "position": {
+          "x": 3040,
+          "y": 340
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score 0-100 on colour match, logo fidelity, geometry and silhouette consistency against the reference. Required frame: Lighting mismatch. QC rule for this system: This workflow IS the QA loop \u2014 self-contained; produces a pass/fail ledger and repaired master file, escalating unresolved shots to human review. Reject and retry if the logo is redrawn, any text is invented or garbled, geometry is warped, or the grade drifts.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 6
+          }
+        },
+        "name": "Keyframe fix 2 \u2014 Lighting mismatch",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_3FE2MFGHMMV2SQ76Z1NH98XWSZ",
+        "kind": "video-reference",
+        "position": {
+          "x": 3800,
+          "y": 340
+        },
+        "config": {
+          "model": "gemini-omni-1.1-flash",
+          "cfg_scale": 0.5,
+          "watermark": false,
+          "resolution": "1080p",
+          "aspect_ratio": "16:9",
+          "generate_audio": true,
+          "negative_prompt": "blur, distort, low quality, warped product geometry, melting logo, garbled text, extra fingers, plastic skin, flicker, jitter, duplicated limbs, watermark, oversaturated HDR halo",
+          "duration_seconds": 6,
+          "enable_safety_checker": true,
+          "prompt_expansion_mode": "balanced",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Re-animate 2 \u2014 Lighting mismatch",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_NCJ5W8AJARXVJQQN9FRCSTCZD3",
+        "kind": "text-gen",
+        "position": {
+          "x": 2280,
+          "y": 680
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 4000,
+          "temperature": 0.3,
+          "system_prompt": "ROLE\nYou are the targeted repair director. The critic's report arrives on your prompt\ninput. You rewrite ONLY the failing asset's generation prompt. You never re-brief the\nwhole batch \u2014 isolated repair is the entire point of this stage.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: video library, section L (Autonomous Production / QA \u2014 Video Repair Loops)\nSystem: V0709 \u2014 Autonomous Video QA & Repair Loop #29\nSubject: Autonomous Video QA & Repair Loop\nTreatment: Autonomous Video QA & Repair Loop #29\nDeclared models for this system: Video Analyzer + Nano Banana Pro (repair keyframes) + Omni Flash 1.1 (repair motion)\nDeclared input: Any generated video batch (single or multi-shot).\n\nThe full pipeline you are one node inside:\nIngestion of rendered video \u2192 Frame Extraction samples N frames per shot \u2192 Quality Critic scores product-fidelity, motion-plausibility, continuity, artifact-freedom per shot \u2192 Failure Vector Classifier tags exact defect (warped geometry / lipsync drift / lighting mismatch / morphing artifact) \u2192 Targeted Repair regenerates ONLY the failing shot segment via Nano Banana Pro keyframe fix + Omni Flash 1.1 re-animation \u2192 Re-splice into master timeline \u2192 Re-score \u2192 escalate to human review after 2 failed repairs.\n\nThe QC stage that will judge your output:\nThis workflow IS the QA loop \u2014 self-contained; produces a pass/fail ledger and repaired master file, escalating unresolved shots to human review.\n\nThe package this pipeline finally owes the client:\nRepaired master video, shot-by-shot QC ledger, escalation queue if unresolved.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"You are an autonomous video QA critic. Sample frames from each shot and score product fidelity, motion plausibility, and continuity against the master spec. Classify any failure by precise defect type so repair can be surgical \u2014 never regenerate a passing shot.\"\"\n\nMETHOD\n1. Read the repair queue. Take the highest-priority failing asset.\n2. Identify the failure vector exactly: colour drift, logo distortion, geometry warp,\n   lighting mismatch, scale error, artifact, continuity break, motion implausibility.\n3. Rewrite that asset's prompt so the failure is addressed by construction, not by\n   pleading \u2014 if the logo warped, change the angle and lens that made it warp and\n   state the logo's exact position and scale; if the colour drifted, restate the\n   exact colourway and remove the ambient bounce that shifted it.\n4. Change nothing else. Every passing attribute of that asset must survive the repair.\n5. Write the stricter negative prompt for the retry.\n\nHARD CONSTRAINTS\n- One asset per repair pass. Never merge two failures into one rewrite.\n- Never \"improve\" anything the critic did not flag.\n- If this is the second failed attempt on the same asset, say so and recommend\n  human review instead of a third automated retry.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"asset_being_repaired\": 0,\n    \"failure_vector\": \"\",\n    \"root_cause\": \"why the original prompt produced it\",\n    \"repaired_clip_prompt\": \"\",\n    \"negative_prompt\": \"\",\n    \"unchanged_attributes\": [\"everything preserved from the passing version\"],\n    \"attempt_number\": 1\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 6
+          }
+        },
+        "name": "Route 3 \u2014 Morphing artifact"
+      },
+      {
+        "id": "nd_XWD29ZFC5GTXHWAM2VHD7WHXPK",
+        "kind": "image-gen",
+        "position": {
+          "x": 3040,
+          "y": 680
+        },
+        "config": {
+          "model": "gemini-3-pro-image-preview",
+          "quality": "auto",
+          "image_size": "2K",
+          "num_images": 1,
+          "enable_eval": true,
+          "eval_prompt": "Score 0-100 on colour match, logo fidelity, geometry and silhouette consistency against the reference. Required frame: Morphing artifact. QC rule for this system: This workflow IS the QA loop \u2014 self-contained; produces a pass/fail ledger and repaired master file, escalating unresolved shots to human review. Reject and retry if the logo is redrawn, any text is invented or garbled, geometry is warped, or the grade drifts.",
+          "aspect_ratio": "16:9",
+          "output_format": "png",
+          "eval_min_score": 7,
+          "eval_max_retries": 2,
+          "eval_model": "gemini-2.5-pro",
+          "appendable_slots": {
+            "reference_images": 6
+          }
+        },
+        "name": "Keyframe fix 3 \u2014 Morphing artifact",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_TZJM06BQG715CGSH9MZBE05YZK",
+        "kind": "video-reference",
+        "position": {
+          "x": 3800,
+          "y": 680
+        },
+        "config": {
+          "model": "gemini-omni-1.1-flash",
+          "cfg_scale": 0.5,
+          "watermark": false,
+          "resolution": "1080p",
+          "aspect_ratio": "16:9",
+          "generate_audio": true,
+          "negative_prompt": "blur, distort, low quality, warped product geometry, melting logo, garbled text, extra fingers, plastic skin, flicker, jitter, duplicated limbs, watermark, oversaturated HDR halo",
+          "duration_seconds": 6,
+          "enable_safety_checker": true,
+          "prompt_expansion_mode": "balanced",
+          "appendable_slots": {
+            "reference_images": 2
+          }
+        },
+        "name": "Re-animate 3 \u2014 Morphing artifact",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_Q7HCXSM2S5QB1MD5M2T3SK816J",
+        "kind": "sticky-note",
+        "position": {
+          "x": 4560,
+          "y": -340
+        },
+        "config": {
+          "text": "STAGE 4 \u2014 RE-SPLICE + RE-SCORE + ESCALATION\nRepaired shots spliced back into the master timeline and re-scored. Two failed repairs on the same shot escalates to human review."
+        }
+      },
+      {
+        "id": "nd_VPQC8V2HZA8VJXGH9VYFATBWK6",
+        "kind": "video-concat",
+        "position": {
+          "x": 4560,
+          "y": 0
+        },
+        "config": {
+          "mute_audio": false,
+          "appendable_slots": {
+            "videos": 3
+          }
+        },
+        "name": "Re-spliced master timeline",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_BBGMAD22NRWXJH68GJ2GD4EPXS",
+        "kind": "text-gen",
+        "position": {
+          "x": 4560,
+          "y": 1360
+        },
+        "config": {
+          "model": "claude-sonnet-4-6",
+          "max_tokens": 6000,
+          "temperature": 0.2,
+          "system_prompt": "ROLE\nYou are the critic and QC gate for this system. The 3 generated assets are wired into your reference slots together with the source reference. The pipeline's own QC\nspecification is quoted below and you implement it literally \u2014 you are not here to\nbe encouraging, you are here to catch what ships badly.\n\nPIPELINE CONTEXT \u2014 read this before you write anything\nLibrary: video library, section L (Autonomous Production / QA \u2014 Video Repair Loops)\nSystem: V0709 \u2014 Autonomous Video QA & Repair Loop #29\nSubject: Autonomous Video QA & Repair Loop\nTreatment: Autonomous Video QA & Repair Loop #29\nDeclared models for this system: Video Analyzer + Nano Banana Pro (repair keyframes) + Omni Flash 1.1 (repair motion)\nDeclared input: Any generated video batch (single or multi-shot).\n\nThe full pipeline you are one node inside:\nIngestion of rendered video \u2192 Frame Extraction samples N frames per shot \u2192 Quality Critic scores product-fidelity, motion-plausibility, continuity, artifact-freedom per shot \u2192 Failure Vector Classifier tags exact defect (warped geometry / lipsync drift / lighting mismatch / morphing artifact) \u2192 Targeted Repair regenerates ONLY the failing shot segment via Nano Banana Pro keyframe fix + Omni Flash 1.1 re-animation \u2192 Re-splice into master timeline \u2192 Re-score \u2192 escalate to human review after 2 failed repairs.\n\nThe QC stage that will judge your output:\nThis workflow IS the QA loop \u2014 self-contained; produces a pass/fail ledger and repaired master file, escalating unresolved shots to human review.\n\nThe package this pipeline finally owes the client:\nRepaired master video, shot-by-shot QC ledger, escalation queue if unresolved.\n\nORIGINAL DIRECTOR SEED \u2014 binding client instruction, do not dilute it\n\"\"You are an autonomous video QA critic. Sample frames from each shot and score product fidelity, motion plausibility, and continuity against the master spec. Classify any failure by precise defect type so repair can be surgical \u2014 never regenerate a passing shot.\"\"\n\nSCORING AXES \u2014 score each 0-100, independently, per asset\n- subject_fidelity: identity and geometry hold across every frame\n- motion_plausibility: physics, weight, no morphing or sliding\n- continuity: boundary frames match at every join point\n- camera_fidelity: the executed move matches the specified move\n- grade_consistency: identical grade across all clips\n- artifact_freedom: flicker, warping, duplicated limbs, text hallucination\n\nMETHOD\n1. Score every asset on every axis. Justify each score with a specific observation:\n   \"key light is camera-left in five assets and camera-right in asset 3\", never\n   \"looks a bit off\".\n2. Diff every asset against the forensics spec on the identity-critical regions:\n   logo, geometry, proportions, colourway, label copy.\n3. Any axis below 90 fails that asset. Record the exact failure vector so the\n   repair node can route the fix: relight / logo-reprint / geometry-lock regen /\n   recompose / re-animate / re-grade.\n4. Flag set-level problems separately from per-asset problems \u2014 a set where every\n   asset passes individually can still fail as a set.\n5. Rank the passing assets for delivery order.\n\nHARD CONSTRAINTS\n- Never pass an asset whose label copy differs from the source.\n- Never pass a comparison, before/after or claim-adjacent asset whose lighting or\n  angle parity would make the comparison misleading.\n- Two failed repair attempts on the same asset escalates to human review. Say so.\n\nOUTPUT CONTRACT \u2014 strict JSON only.\n{\n    \"per_asset\": [{\"asset\":1,\"scores\":{},\"observations\":[],\"verdict\":\"pass|fail\",\"failure_vector\":\"\",\"repair_route\":\"\"}],\n    \"set_level_findings\": [{\"attribute\":\"\",\"finding\":\"\",\"assets_affected\":[]}],\n    \"repair_queue\": [{\"asset\":1,\"instruction\":\"\"}],\n    \"escalate_to_human\": [],\n    \"delivery_order\": []\n}\n\nSELF-CHECK BEFORE OUTPUT\n1. Every field in the output contract present and non-empty?\n2. Strictly valid JSON, no markdown fences, no commentary outside the JSON?\n3. Any invented brand text, claim, price, statistic or certification? Delete it.\n4. Every prompt inside its word budget?\n5. Would the downstream QC stage quoted above pass this on the first attempt?\n",
+          "appendable_slots": {
+            "reference_images": 6
+          }
+        },
+        "name": "Re-score \u2014 post-repair verification"
+      },
+      {
+        "id": "nd_YY8C8WZ5M03SEWZWY41HWZXDJW",
+        "kind": "download",
+        "position": {
+          "x": 5320,
+          "y": 340
+        },
+        "config": {
+          "appendable_slots": {
+            "videos": 4
+          }
+        },
+        "name": "Download \u2014 final deliverables"
+      }
+    ],
+    "edges": [
+      {
+        "id": "eg_X8FQ6B283GRS717JQEDJEFS4FP",
+        "source": "nd_HC7V4BFSS9YK5XBB7QEERWWN8Q",
+        "sourceHandle": "video",
+        "target": "nd_SES853BEW0M56GZ9HKWM0G22D6",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_CTT8511XGQF2QC91A7EADQ4BRN",
+        "source": "nd_HC7V4BFSS9YK5XBB7QEERWWN8Q",
+        "sourceHandle": "video",
+        "target": "nd_D54PA8H7M46PHQ8JAF2K9345QA",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_VFHTVSV6YP76GDZVZ4EBJQQ23G",
+        "source": "nd_HC7V4BFSS9YK5XBB7QEERWWN8Q",
+        "sourceHandle": "video",
+        "target": "nd_Z0V5NXVWXMZ8Y0Y2M12HT25VW5",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_NRSDSVMJAC6S4DD3PEREBD5GKG",
+        "source": "nd_HC7V4BFSS9YK5XBB7QEERWWN8Q",
+        "sourceHandle": "video",
+        "target": "nd_FP80TSY8XBEAC2DRKW2ZQ8TVT1",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_BQFQG183WA78XRGT51N836SJN9",
+        "source": "nd_HC7V4BFSS9YK5XBB7QEERWWN8Q",
+        "sourceHandle": "video",
+        "target": "nd_GD0P7926FY2MBVEX4XA57E9QE6",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_S9XTTCNC49AG97Z4755GB0J5MC",
+        "source": "nd_HC7V4BFSS9YK5XBB7QEERWWN8Q",
+        "sourceHandle": "video",
+        "target": "nd_D2278X6PHTDBWK2GE3ZGB8TEPM",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_AZXZES4GZBXJC8JGGM33EAR0JP",
+        "source": "nd_SES853BEW0M56GZ9HKWM0G22D6",
+        "sourceHandle": "text",
+        "target": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_E3BYMSFHMTR09PD0FND0Z4XCTM",
+        "source": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "sourceHandle": "image",
+        "target": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_77998B3HX7NCYD53GZEK7GZ386",
+        "source": "nd_D54PA8H7M46PHQ8JAF2K9345QA",
+        "sourceHandle": "image",
+        "target": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_HQ9P9SRE9PZDDPZ0N9ZDJ12TSX",
+        "source": "nd_Z0V5NXVWXMZ8Y0Y2M12HT25VW5",
+        "sourceHandle": "image",
+        "target": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_573N7JCZ4VSPF5YQE180DHT2CA",
+        "source": "nd_FP80TSY8XBEAC2DRKW2ZQ8TVT1",
+        "sourceHandle": "image",
+        "target": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "targetHandle": "reference_images__3"
+      },
+      {
+        "id": "eg_7889BFYMA0V6C4CHHQ8E3271BH",
+        "source": "nd_GD0P7926FY2MBVEX4XA57E9QE6",
+        "sourceHandle": "image",
+        "target": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "targetHandle": "reference_images__4"
+      },
+      {
+        "id": "eg_AZ978K0MH4NH5WRDXWNZPHM4E4",
+        "source": "nd_D2278X6PHTDBWK2GE3ZGB8TEPM",
+        "sourceHandle": "image",
+        "target": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "targetHandle": "reference_images__5"
+      },
+      {
+        "id": "eg_DQ61RWC20CF6S4G7J480ZA6ZJ5",
+        "source": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "sourceHandle": "text",
+        "target": "nd_YY4AX2D7KW4WDD172S1FC2BYAN",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_HY1DJJ9BKP9ZHSG72ME6HTX9GH",
+        "source": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "sourceHandle": "image",
+        "target": "nd_YY4AX2D7KW4WDD172S1FC2BYAN",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_R48QE5F55S01GH282MGTZ82YWT",
+        "source": "nd_D54PA8H7M46PHQ8JAF2K9345QA",
+        "sourceHandle": "image",
+        "target": "nd_YY4AX2D7KW4WDD172S1FC2BYAN",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_70XTF1S66ASG8N7WV4V6V15KXV",
+        "source": "nd_Z0V5NXVWXMZ8Y0Y2M12HT25VW5",
+        "sourceHandle": "image",
+        "target": "nd_YY4AX2D7KW4WDD172S1FC2BYAN",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_0MMZMYAJQ7D2KSAJYYV95ZQBC8",
+        "source": "nd_FP80TSY8XBEAC2DRKW2ZQ8TVT1",
+        "sourceHandle": "image",
+        "target": "nd_YY4AX2D7KW4WDD172S1FC2BYAN",
+        "targetHandle": "reference_images__3"
+      },
+      {
+        "id": "eg_J3KA4EGXFKMTV45BKC7JF5XHTX",
+        "source": "nd_GD0P7926FY2MBVEX4XA57E9QE6",
+        "sourceHandle": "image",
+        "target": "nd_YY4AX2D7KW4WDD172S1FC2BYAN",
+        "targetHandle": "reference_images__4"
+      },
+      {
+        "id": "eg_4PR9RPFWGZ8TG6ADMXGEEKJZ86",
+        "source": "nd_D2278X6PHTDBWK2GE3ZGB8TEPM",
+        "sourceHandle": "image",
+        "target": "nd_YY4AX2D7KW4WDD172S1FC2BYAN",
+        "targetHandle": "reference_images__5"
+      },
+      {
+        "id": "eg_3QK18B8DH4HNVABK37ZYQHQTHX",
+        "source": "nd_YY4AX2D7KW4WDD172S1FC2BYAN",
+        "sourceHandle": "text",
+        "target": "nd_804PSYB6MP0NYV94PS5VCSY494",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_68M46J3DXYG4XM4CMH8JDT0QPA",
+        "source": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "sourceHandle": "image",
+        "target": "nd_804PSYB6MP0NYV94PS5VCSY494",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_HYB5HRKBX2EPGFHANS2221QFR6",
+        "source": "nd_D54PA8H7M46PHQ8JAF2K9345QA",
+        "sourceHandle": "image",
+        "target": "nd_804PSYB6MP0NYV94PS5VCSY494",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_TM0H1DKQPFNG15AH3VS33NMH06",
+        "source": "nd_Z0V5NXVWXMZ8Y0Y2M12HT25VW5",
+        "sourceHandle": "image",
+        "target": "nd_804PSYB6MP0NYV94PS5VCSY494",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_CZ1FGT6E9ED9P3PZGT2RASV99P",
+        "source": "nd_FP80TSY8XBEAC2DRKW2ZQ8TVT1",
+        "sourceHandle": "image",
+        "target": "nd_804PSYB6MP0NYV94PS5VCSY494",
+        "targetHandle": "reference_images__3"
+      },
+      {
+        "id": "eg_ENGRV80WH5ZFF04GZBF5FCJYSM",
+        "source": "nd_GD0P7926FY2MBVEX4XA57E9QE6",
+        "sourceHandle": "image",
+        "target": "nd_804PSYB6MP0NYV94PS5VCSY494",
+        "targetHandle": "reference_images__4"
+      },
+      {
+        "id": "eg_7MJR9WXASK53FTK7XHNA2HPKD2",
+        "source": "nd_D2278X6PHTDBWK2GE3ZGB8TEPM",
+        "sourceHandle": "image",
+        "target": "nd_804PSYB6MP0NYV94PS5VCSY494",
+        "targetHandle": "reference_images__5"
+      },
+      {
+        "id": "eg_HGYND45V5SG7KF9A6DQ0VWJWVG",
+        "source": "nd_YY4AX2D7KW4WDD172S1FC2BYAN",
+        "sourceHandle": "text",
+        "target": "nd_4FQYQ1FKVYCSGYHHD4MRYABNC9",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_YF8MQ7KBDBXVNT8FF9CATX6VFB",
+        "source": "nd_804PSYB6MP0NYV94PS5VCSY494",
+        "sourceHandle": "image",
+        "target": "nd_4FQYQ1FKVYCSGYHHD4MRYABNC9",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_GGJMSW5EVSA2HYT00M7MQ4T8QP",
+        "source": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "sourceHandle": "image",
+        "target": "nd_4FQYQ1FKVYCSGYHHD4MRYABNC9",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_8TD783V4QRGHDFFZK2MHNEACZ9",
+        "source": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "sourceHandle": "text",
+        "target": "nd_7AS1GR6XYWF2XXJ0VEYX5ZKCTF",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_Q1X8M0NZX9YD0XBXWTV67GYJQS",
+        "source": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "sourceHandle": "image",
+        "target": "nd_7AS1GR6XYWF2XXJ0VEYX5ZKCTF",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_91RJ0G7AD7E3WVHWCP2SPY43GQ",
+        "source": "nd_D54PA8H7M46PHQ8JAF2K9345QA",
+        "sourceHandle": "image",
+        "target": "nd_7AS1GR6XYWF2XXJ0VEYX5ZKCTF",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_HZ3HWZRFG4847JZNJVTXHWZQ24",
+        "source": "nd_Z0V5NXVWXMZ8Y0Y2M12HT25VW5",
+        "sourceHandle": "image",
+        "target": "nd_7AS1GR6XYWF2XXJ0VEYX5ZKCTF",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_B1QHBW1PAFK75BN8GZVHR056BA",
+        "source": "nd_FP80TSY8XBEAC2DRKW2ZQ8TVT1",
+        "sourceHandle": "image",
+        "target": "nd_7AS1GR6XYWF2XXJ0VEYX5ZKCTF",
+        "targetHandle": "reference_images__3"
+      },
+      {
+        "id": "eg_46136C4HA8DCVYRD800P91CVYR",
+        "source": "nd_GD0P7926FY2MBVEX4XA57E9QE6",
+        "sourceHandle": "image",
+        "target": "nd_7AS1GR6XYWF2XXJ0VEYX5ZKCTF",
+        "targetHandle": "reference_images__4"
+      },
+      {
+        "id": "eg_7GF78CTBKPCXFRKV4QRG94RSSY",
+        "source": "nd_D2278X6PHTDBWK2GE3ZGB8TEPM",
+        "sourceHandle": "image",
+        "target": "nd_7AS1GR6XYWF2XXJ0VEYX5ZKCTF",
+        "targetHandle": "reference_images__5"
+      },
+      {
+        "id": "eg_4BY5HK8BB25063H0JSCJBXX90D",
+        "source": "nd_7AS1GR6XYWF2XXJ0VEYX5ZKCTF",
+        "sourceHandle": "text",
+        "target": "nd_4C7PAZ9MTD6RDWEJJ8WHCABVE5",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_GY6SF35TE0T4H2KB55RBWZG6VN",
+        "source": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "sourceHandle": "image",
+        "target": "nd_4C7PAZ9MTD6RDWEJJ8WHCABVE5",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_771SFA1Y1XXMS4JYKK0MADNMFM",
+        "source": "nd_D54PA8H7M46PHQ8JAF2K9345QA",
+        "sourceHandle": "image",
+        "target": "nd_4C7PAZ9MTD6RDWEJJ8WHCABVE5",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_28GZY6MDH0RY43HDY0FXZTKCKY",
+        "source": "nd_Z0V5NXVWXMZ8Y0Y2M12HT25VW5",
+        "sourceHandle": "image",
+        "target": "nd_4C7PAZ9MTD6RDWEJJ8WHCABVE5",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_KKSXW26AG838JTDPS4S6Y7P26V",
+        "source": "nd_FP80TSY8XBEAC2DRKW2ZQ8TVT1",
+        "sourceHandle": "image",
+        "target": "nd_4C7PAZ9MTD6RDWEJJ8WHCABVE5",
+        "targetHandle": "reference_images__3"
+      },
+      {
+        "id": "eg_491TX9JE2NPT3DV44H59F31E6S",
+        "source": "nd_GD0P7926FY2MBVEX4XA57E9QE6",
+        "sourceHandle": "image",
+        "target": "nd_4C7PAZ9MTD6RDWEJJ8WHCABVE5",
+        "targetHandle": "reference_images__4"
+      },
+      {
+        "id": "eg_RMXSAQN2B0AMFDQNX2W883MKQM",
+        "source": "nd_D2278X6PHTDBWK2GE3ZGB8TEPM",
+        "sourceHandle": "image",
+        "target": "nd_4C7PAZ9MTD6RDWEJJ8WHCABVE5",
+        "targetHandle": "reference_images__5"
+      },
+      {
+        "id": "eg_XCX5A5CN5BNZ5TKG3CRZ106Z2E",
+        "source": "nd_7AS1GR6XYWF2XXJ0VEYX5ZKCTF",
+        "sourceHandle": "text",
+        "target": "nd_3FE2MFGHMMV2SQ76Z1NH98XWSZ",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_KC5K2C0RN6ZCAH96N0DXS0MCGT",
+        "source": "nd_4C7PAZ9MTD6RDWEJJ8WHCABVE5",
+        "sourceHandle": "image",
+        "target": "nd_3FE2MFGHMMV2SQ76Z1NH98XWSZ",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_WSVGPC0D77MF7W212PBZ68SFHY",
+        "source": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "sourceHandle": "image",
+        "target": "nd_3FE2MFGHMMV2SQ76Z1NH98XWSZ",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_DFWZTZ0F7SQCNKGEKAD6XH6W1E",
+        "source": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "sourceHandle": "text",
+        "target": "nd_NCJ5W8AJARXVJQQN9FRCSTCZD3",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_GCX6PZ858ECNKJXZ5MW4RXTEH1",
+        "source": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "sourceHandle": "image",
+        "target": "nd_NCJ5W8AJARXVJQQN9FRCSTCZD3",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_S1720JY8FCC4KSDFN34QKPMECJ",
+        "source": "nd_D54PA8H7M46PHQ8JAF2K9345QA",
+        "sourceHandle": "image",
+        "target": "nd_NCJ5W8AJARXVJQQN9FRCSTCZD3",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_S8R9G9Z03NZAH6WH28JN3GNW6H",
+        "source": "nd_Z0V5NXVWXMZ8Y0Y2M12HT25VW5",
+        "sourceHandle": "image",
+        "target": "nd_NCJ5W8AJARXVJQQN9FRCSTCZD3",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_CBN4PSW8R47DMB10A7G6517EC3",
+        "source": "nd_FP80TSY8XBEAC2DRKW2ZQ8TVT1",
+        "sourceHandle": "image",
+        "target": "nd_NCJ5W8AJARXVJQQN9FRCSTCZD3",
+        "targetHandle": "reference_images__3"
+      },
+      {
+        "id": "eg_ZS3J333RETPF90XWW914ZC2CW3",
+        "source": "nd_GD0P7926FY2MBVEX4XA57E9QE6",
+        "sourceHandle": "image",
+        "target": "nd_NCJ5W8AJARXVJQQN9FRCSTCZD3",
+        "targetHandle": "reference_images__4"
+      },
+      {
+        "id": "eg_K20QZ6PWM10EQ42ED2G0XD7VYS",
+        "source": "nd_D2278X6PHTDBWK2GE3ZGB8TEPM",
+        "sourceHandle": "image",
+        "target": "nd_NCJ5W8AJARXVJQQN9FRCSTCZD3",
+        "targetHandle": "reference_images__5"
+      },
+      {
+        "id": "eg_PHHBDS0HGKA52HJ5D9H8G74Q8W",
+        "source": "nd_NCJ5W8AJARXVJQQN9FRCSTCZD3",
+        "sourceHandle": "text",
+        "target": "nd_XWD29ZFC5GTXHWAM2VHD7WHXPK",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_M5P2PVZK6JP2Y0SRW8HVTTRMS5",
+        "source": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "sourceHandle": "image",
+        "target": "nd_XWD29ZFC5GTXHWAM2VHD7WHXPK",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_62WJAS260Y84FVJ8D47C0FBETK",
+        "source": "nd_D54PA8H7M46PHQ8JAF2K9345QA",
+        "sourceHandle": "image",
+        "target": "nd_XWD29ZFC5GTXHWAM2VHD7WHXPK",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_SN1N5QAMQ3AHBCV7N6MTF88P3W",
+        "source": "nd_Z0V5NXVWXMZ8Y0Y2M12HT25VW5",
+        "sourceHandle": "image",
+        "target": "nd_XWD29ZFC5GTXHWAM2VHD7WHXPK",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_2DAXDVKJV69Y70CAQ7XYYJWDRN",
+        "source": "nd_FP80TSY8XBEAC2DRKW2ZQ8TVT1",
+        "sourceHandle": "image",
+        "target": "nd_XWD29ZFC5GTXHWAM2VHD7WHXPK",
+        "targetHandle": "reference_images__3"
+      },
+      {
+        "id": "eg_E30SPAFJ5S9707NPMGRDNXPPWD",
+        "source": "nd_GD0P7926FY2MBVEX4XA57E9QE6",
+        "sourceHandle": "image",
+        "target": "nd_XWD29ZFC5GTXHWAM2VHD7WHXPK",
+        "targetHandle": "reference_images__4"
+      },
+      {
+        "id": "eg_XXYEMYMQ1RDEZZECYRFMRDA9BM",
+        "source": "nd_D2278X6PHTDBWK2GE3ZGB8TEPM",
+        "sourceHandle": "image",
+        "target": "nd_XWD29ZFC5GTXHWAM2VHD7WHXPK",
+        "targetHandle": "reference_images__5"
+      },
+      {
+        "id": "eg_CQ9WVNDZYNEDJXT1KNWC9Z5KZ5",
+        "source": "nd_NCJ5W8AJARXVJQQN9FRCSTCZD3",
+        "sourceHandle": "text",
+        "target": "nd_TZJM06BQG715CGSH9MZBE05YZK",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_5DWAEE0VG8SQNEZCCJ908PCJN4",
+        "source": "nd_XWD29ZFC5GTXHWAM2VHD7WHXPK",
+        "sourceHandle": "image",
+        "target": "nd_TZJM06BQG715CGSH9MZBE05YZK",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_MGM9GKXM03AR4YKGPE8MZ0RA1H",
+        "source": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "sourceHandle": "image",
+        "target": "nd_TZJM06BQG715CGSH9MZBE05YZK",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_QSB6V3SMQ8JMED942CJXXF7W16",
+        "source": "nd_4FQYQ1FKVYCSGYHHD4MRYABNC9",
+        "sourceHandle": "video",
+        "target": "nd_VPQC8V2HZA8VJXGH9VYFATBWK6",
+        "targetHandle": "videos__0"
+      },
+      {
+        "id": "eg_NE9TY96MPKZ7P4CJ8TSR04Y66F",
+        "source": "nd_3FE2MFGHMMV2SQ76Z1NH98XWSZ",
+        "sourceHandle": "video",
+        "target": "nd_VPQC8V2HZA8VJXGH9VYFATBWK6",
+        "targetHandle": "videos__1"
+      },
+      {
+        "id": "eg_CNV0Q24YGV91X16HFFFZBFCYE1",
+        "source": "nd_TZJM06BQG715CGSH9MZBE05YZK",
+        "sourceHandle": "video",
+        "target": "nd_VPQC8V2HZA8VJXGH9VYFATBWK6",
+        "targetHandle": "videos__2"
+      },
+      {
+        "id": "eg_Y562XBXQPXCG9KHV5QDRV9YRRE",
+        "source": "nd_G39FAFFNMM77FD2ARANBXWWXTP",
+        "sourceHandle": "text",
+        "target": "nd_BBGMAD22NRWXJH68GJ2GD4EPXS",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_QAB5BVS8NXYAECVWVZYXMJRG7V",
+        "source": "nd_SR6NGA80QTWMAA63RCX13AMAKP",
+        "sourceHandle": "image",
+        "target": "nd_BBGMAD22NRWXJH68GJ2GD4EPXS",
+        "targetHandle": "reference_images__0"
+      },
+      {
+        "id": "eg_TN5X7ZFWK3SNJJTXBPE759PJ91",
+        "source": "nd_D54PA8H7M46PHQ8JAF2K9345QA",
+        "sourceHandle": "image",
+        "target": "nd_BBGMAD22NRWXJH68GJ2GD4EPXS",
+        "targetHandle": "reference_images__1"
+      },
+      {
+        "id": "eg_EKR2C67VS7FNHHGFE478N9A6F0",
+        "source": "nd_Z0V5NXVWXMZ8Y0Y2M12HT25VW5",
+        "sourceHandle": "image",
+        "target": "nd_BBGMAD22NRWXJH68GJ2GD4EPXS",
+        "targetHandle": "reference_images__2"
+      },
+      {
+        "id": "eg_QS5X89PMJ71Q30VECPXK9BWYPQ",
+        "source": "nd_FP80TSY8XBEAC2DRKW2ZQ8TVT1",
+        "sourceHandle": "image",
+        "target": "nd_BBGMAD22NRWXJH68GJ2GD4EPXS",
+        "targetHandle": "reference_images__3"
+      },
+      {
+        "id": "eg_H51JSZCZ7ANM630859V974094F",
+        "source": "nd_GD0P7926FY2MBVEX4XA57E9QE6",
+        "sourceHandle": "image",
+        "target": "nd_BBGMAD22NRWXJH68GJ2GD4EPXS",
+        "targetHandle": "reference_images__4"
+      },
+      {
+        "id": "eg_XN6SDP2JEZ3A49FESX3HKNE769",
+        "source": "nd_D2278X6PHTDBWK2GE3ZGB8TEPM",
+        "sourceHandle": "image",
+        "target": "nd_BBGMAD22NRWXJH68GJ2GD4EPXS",
+        "targetHandle": "reference_images__5"
+      },
+      {
+        "id": "eg_322FTX5A5KNW32TANNWY4TZS1A",
+        "source": "nd_4FQYQ1FKVYCSGYHHD4MRYABNC9",
+        "sourceHandle": "video",
+        "target": "nd_YY8C8WZ5M03SEWZWY41HWZXDJW",
+        "targetHandle": "videos__0"
+      },
+      {
+        "id": "eg_4B1NZK3HJYADDVWHGW1W19A56E",
+        "source": "nd_3FE2MFGHMMV2SQ76Z1NH98XWSZ",
+        "sourceHandle": "video",
+        "target": "nd_YY8C8WZ5M03SEWZWY41HWZXDJW",
+        "targetHandle": "videos__1"
+      },
+      {
+        "id": "eg_C4R00P4YXNWJVN4GV5Q57T2XN3",
+        "source": "nd_TZJM06BQG715CGSH9MZBE05YZK",
+        "sourceHandle": "video",
+        "target": "nd_YY8C8WZ5M03SEWZWY41HWZXDJW",
+        "targetHandle": "videos__2"
+      },
+      {
+        "id": "eg_ZGR8NS1P5WD7FKJSK5QD0V8GCP",
+        "source": "nd_VPQC8V2HZA8VJXGH9VYFATBWK6",
+        "sourceHandle": "video",
+        "target": "nd_YY8C8WZ5M03SEWZWY41HWZXDJW",
+        "targetHandle": "videos__3"
+      }
+    ]
+  }
+}

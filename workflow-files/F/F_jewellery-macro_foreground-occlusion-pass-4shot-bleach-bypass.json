@@ -1,0 +1,200 @@
+{
+  "format": "vibe-workflow-export",
+  "formatVersion": 1,
+  "exportedAt": "2026-09-20T20:07:23.000Z",
+  "doc": {
+    "name": "F \u2014 jewellery macro reshoot, foreground occlusion pass, 4 shots",
+    "nodes": [
+      {
+        "id": "nd_HCYAJ71S8HV5WH37FRAZBF74YN",
+        "kind": "video-input",
+        "position": {
+          "x": 0,
+          "y": 300
+        },
+        "config": {
+          "url": ""
+        },
+        "name": "Source clip *"
+      },
+      {
+        "id": "nd_X0R4TXX0MW0S1K4BPAM2ZVXT6M",
+        "kind": "prompt",
+        "position": {
+          "x": 0,
+          "y": 600
+        },
+        "config": {
+          "text": "RESHOOT BRIEF \u2014 edit before running.\nSource domain: jewellery macro\nCoverage style: foreground occlusion pass\nLocked: subject, wardrobe, action, location, runtime\nOverridden: camera angle, movement, lens, height, cut rhythm\nPaste the source video URL into the Video input node."
+        },
+        "name": "Reshoot brief"
+      },
+      {
+        "id": "nd_YKDHPT878DBWVP85XE8SA0DXAF",
+        "kind": "sticky-note",
+        "position": {
+          "x": 0,
+          "y": -60
+        },
+        "config": {
+          "text": "STAGE 1 \u2014 source video is analysed factually, then re-blocked into a timecoded shot list."
+        },
+        "name": "Stage 1"
+      },
+      {
+        "id": "nd_6NQ7HK3W82KVVYAX61HKJNTSG1",
+        "kind": "sticky-note",
+        "position": {
+          "x": 2100,
+          "y": -60
+        },
+        "config": {
+          "text": "STAGE 2 \u2014 the shot list becomes one cinematic prompt; video-edit reshoots the original while holding subject and action."
+        },
+        "name": "Stage 2"
+      },
+      {
+        "id": "nd_QYTD55JDY9S0Y2ZT4H0SXT86GE",
+        "kind": "video-analyzer",
+        "position": {
+          "x": 700,
+          "y": 300
+        },
+        "config": {},
+        "name": "Source analysis"
+      },
+      {
+        "id": "nd_7Q6DB8D8Y2N0DC6D2TYEXQ1NSM",
+        "kind": "concat",
+        "position": {
+          "x": 1050,
+          "y": 450
+        },
+        "config": {
+          "separator": "\n\n---\n\n",
+          "appendable_slots": {
+            "parts": 2
+          }
+        },
+        "name": "Brief + analysis"
+      },
+      {
+        "id": "nd_RY5NFX0Q2TC629MZXHVN1Q7VX2",
+        "kind": "text-gen",
+        "position": {
+          "x": 1400,
+          "y": 450
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 1600,
+          "temperature": 0.74,
+          "system_prompt": "You are the shot-list author for a jewellery macro recut. The upstream analysis you receive describes the source clip's subject, action beats, wardrobe, environment and total runtime.\n\nTASK. Convert that analysis into a 4-shot camera plan in a foreground occlusion pass idiom. The subject, action and location are FIXED \u2014 you are only re-authoring how the camera sees them.\n\nTIMECODE RULES. Cover the FULL source duration with contiguous timecodes: every shot starts exactly where the previous one ends, the first begins at 00:00 and the last ends on the reported runtime. Never leave a gap, never overlap, never invent runtime the analysis did not report.\n\nSHOT RULES. Minimum 4 distinct shots. No angle, shot size or move may repeat back-to-back; vary lens, height and distance between consecutive shots. Each entry states: timecode range, shot size, lens, camera height, camera move, and the single action beat it must land.\n\nSUGGESTED VOCABULARY. Draw moves from choices like a parallax slide with strong foreground/background separation, a handheld follow with visible micro-shake and breathing correction and a rack focus pulling from foreground occlusion to the subject; sizes from close-up and top-down flat frame.\n\nOUTPUT. Return the shot list only, one shot per line, in the form `00:00-00:03 | size | lens | height | move | beat`. No preamble, no summary, no markdown table."
+        },
+        "name": "Camera angle director"
+      },
+      {
+        "id": "nd_Z2AJ9Q0PFG3PA7Z9CSZ3APATF1",
+        "kind": "text-gen",
+        "position": {
+          "x": 1750,
+          "y": 450
+        },
+        "config": {
+          "model": "gpt-5.5",
+          "max_tokens": 1600,
+          "temperature": 0.69,
+          "system_prompt": "You are the cinematic prompt writer for a jewellery macro reshoot. You receive a timecoded shot list and must fuse it into ONE production-ready video-generation prompt.\n\nCONTINUITY. The prompt must instruct the model to preserve the ORIGINAL clip's subject identity, wardrobe, props, environment, action and pacing exactly as analysed. Only the camera work is overridden. State this continuity requirement inside the prompt itself, not as a note to the reader.\n\nCAMERA. Translate every shot in the list into flowing prose with explicit timecodes, naming lens, height, move and cut point for each. Preserve the list's order and its foreground occlusion pass idiom.\n\nLOOK. Specify exposure, bare-bulb specular light producing tight, hot speculars, and a grade reading as a filmic grade with halation on the specular highlights. Add a negative clause covering blur, distort, and low quality.\n\nAUDIO. Note whether diegetic audio should be regenerated or held from source, and describe the intended sound bed in one clause.\n\nOUTPUT. Emit one prompt, one paragraph, no framing text of any kind before or after it."
+        },
+        "name": "Cinematic prompt writer"
+      },
+      {
+        "id": "nd_P61FYXEB7QDR3RNNFA6GHXX8DX",
+        "kind": "video-edit",
+        "position": {
+          "x": 2100,
+          "y": 300
+        },
+        "config": {
+          "task": "edit",
+          "model": "gemini-omni-1.1-flash",
+          "resolution": "720p"
+        },
+        "name": "Reshoot render",
+        "includeInOutput": true
+      },
+      {
+        "id": "nd_MC88P5JMMCHPDDS37HKVPSAH28",
+        "kind": "download",
+        "position": {
+          "x": 2500,
+          "y": 300
+        },
+        "config": {
+          "appendable_slots": {
+            "videos": 1
+          }
+        },
+        "name": "Reshot cut"
+      }
+    ],
+    "edges": [
+      {
+        "id": "eg_010TMBY37A7VR80YEPPBWDFAQM",
+        "source": "nd_HCYAJ71S8HV5WH37FRAZBF74YN",
+        "sourceHandle": "video",
+        "target": "nd_QYTD55JDY9S0Y2ZT4H0SXT86GE",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_FF8WH7TPRWZFBC2DS2KPPTBE77",
+        "source": "nd_X0R4TXX0MW0S1K4BPAM2ZVXT6M",
+        "sourceHandle": "text",
+        "target": "nd_7Q6DB8D8Y2N0DC6D2TYEXQ1NSM",
+        "targetHandle": "parts__0"
+      },
+      {
+        "id": "eg_366YVRHZE6GVS3CSXH0EWP9PSE",
+        "source": "nd_QYTD55JDY9S0Y2ZT4H0SXT86GE",
+        "sourceHandle": "text",
+        "target": "nd_7Q6DB8D8Y2N0DC6D2TYEXQ1NSM",
+        "targetHandle": "parts__1"
+      },
+      {
+        "id": "eg_Q104VDYSCCWWXG0D6QPNHQ9HPZ",
+        "source": "nd_7Q6DB8D8Y2N0DC6D2TYEXQ1NSM",
+        "sourceHandle": "text",
+        "target": "nd_RY5NFX0Q2TC629MZXHVN1Q7VX2",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_KJVARWX9QF0GZCX8R5Y9HMT0CT",
+        "source": "nd_RY5NFX0Q2TC629MZXHVN1Q7VX2",
+        "sourceHandle": "text",
+        "target": "nd_Z2AJ9Q0PFG3PA7Z9CSZ3APATF1",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_TDC7MY40RE3RG09C8QK3PP70X2",
+        "source": "nd_Z2AJ9Q0PFG3PA7Z9CSZ3APATF1",
+        "sourceHandle": "text",
+        "target": "nd_P61FYXEB7QDR3RNNFA6GHXX8DX",
+        "targetHandle": "prompt"
+      },
+      {
+        "id": "eg_J09BP2ZW8Z645JJMTMG4EQ11QZ",
+        "source": "nd_HCYAJ71S8HV5WH37FRAZBF74YN",
+        "sourceHandle": "video",
+        "target": "nd_P61FYXEB7QDR3RNNFA6GHXX8DX",
+        "targetHandle": "video"
+      },
+      {
+        "id": "eg_QDMM84EDP3CXF712WW39ZPGT9V",
+        "source": "nd_P61FYXEB7QDR3RNNFA6GHXX8DX",
+        "sourceHandle": "video",
+        "target": "nd_MC88P5JMMCHPDDS37HKVPSAH28",
+        "targetHandle": "videos__0"
+      }
+    ]
+  }
+}
